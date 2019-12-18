@@ -1,21 +1,9 @@
 import json
-import webbrowser
 import pyperclip
-from dependencies.encryptPasswords import encrypt
-from dependencies.memetext import memeify
+import importlib
+
 data = None
-
-
-class MethodController:
-    def openURL(self, URL):
-        webbrowser.open(URL)
-
-    def jasyptEncrypt(self, clipboardContext):
-        encrypt(clipboardContext)
-
-    def memetext(self, clipboardContext):
-        memeify(clipboardContext)
-
+modules = {}
 
 def printOptions(options, key=None):
     i = 1
@@ -66,15 +54,17 @@ def getUserFunctions(shortcuts, user):
     return functions
 
 
-def getDefinitionFromController(methodController, methodName):
-    if(hasattr(methodController, methodName)):
+def getDefinitionFromModule(module, methodName):
+    if(hasattr(module, methodName)):
         try:
-            func = getattr(methodController, methodName)
+            func = getattr(module, methodName)
             return func
         except AttributeError:
             print("There was an attribute error.")
         except:
             print("There was some other error")
+    else: 
+        raise Exception("Couldn't find that a method with that name in the module.")
 
 
 def createKWArgs(function, schema):
@@ -94,11 +84,30 @@ def createKWArgs(function, schema):
         KWArgs[parameter] = arguments[parameter]
     return KWArgs
 
+def importDepencies():
+    dependencyJSON = None
+    with open('./dependencies.json') as file: 
+        dependencyJSON = json.load(file)
+    python = dependencyJSON["python"]
+    folders = dependencyJSON["folders"]
+    files = dependencyJSON["files"]
+    
+    importPythonModules(python)
+
+def importPythonModules(pythonDependencies):
+    global modules
+    for dependency in pythonDependencies:
+        try:
+            moduleImport = "dependencies." + dependency
+            module = importlib.import_module(moduleImport)
+            modules[dependency] = module
+            print("Loaded module: %s" % (dependency))
+        except ModuleNotFoundError:
+            raise Exception("Error importing python dependecies.")
 
 def main():
     with open('./mokha.json') as file:
         data = json.load(file)
-    methodController = MethodController()
     accounts = data["accounts"]
     shortcuts = data["shortcuts"]
     methods = data["methods"]
@@ -108,8 +117,12 @@ def main():
         functions = getUserFunctions(shortcuts, user)
         selectedFunction = getSelection(functions, key="title")
         method = getShortcutMethod(methods, selectedFunction)
-        definition = getDefinitionFromController(
-            methodController, method["name"])
+        # TODO: get module from modules
+        moduleName = method["dependency"]
+        module = modules[moduleName]
+        print(module)
+        definition = getDefinitionFromModule(
+            module, method["name"])
         arguments = createKWArgs(selectedFunction, method["schema"])
         definition(**arguments)
     except KeyboardInterrupt:
@@ -119,5 +132,12 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Attemping to import depencies.")
+    print("---------------------")
+    try:
+        importDepencies()
+    except:
+        exit("Buh baiiii")
+    print("---------------------")
     print("Welcome to Mokha V0.1-a. This is a tool designed to enable configuration of shortcuts to python code.")
     main()
