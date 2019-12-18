@@ -2,6 +2,7 @@ import json
 import webbrowser
 import pyperclip
 from dependencies.encryptPasswords import encrypt
+from dependencies.memetext import memeify
 data = None
 
 
@@ -11,6 +12,9 @@ class MethodController:
 
     def jasyptEncrypt(self, clipboardContext):
         encrypt(clipboardContext)
+
+    def memetext(self, clipboardContext):
+        memeify(clipboardContext)
 
 
 def printOptions(options, key=None):

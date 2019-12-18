@@ -75,6 +75,12 @@
           "arguments": {
             "clipboardContext": {}
           }
+        },
+        {
+          "shortcutID": "9",
+          "arguments": {
+            "clipboardContext": {}
+          }
         }
       ]
     }
@@ -119,6 +125,11 @@
       "--id": "8",
       "title": "EncryptJasypt",
       "methodID": "2"
+    },
+    {
+      "--id": "9",
+      "title": "Memeify Text",
+      "methodID": "3"
     }
   ],
   "methods": [
@@ -133,6 +144,14 @@
     {
       "--id": "2",
       "name": "jasyptEncrypt",
+      "schema": {
+        "numParams": 1,
+        "parameterNames": ["clipboardContext"]
+      }
+    },
+    {
+      "--id": "3",
+      "name": "memetext",
       "schema": {
         "numParams": 1,
         "parameterNames": ["clipboardContext"]
