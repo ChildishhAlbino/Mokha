@@ -1,0 +1,15 @@
+{
+    "python": [
+        "memetext",
+        "encryptPasswords",
+        "openURL"
+    ],
+    "folders":[
+        "jasypt",
+        "jasypt/bin",
+        "jasypt/lib"
+    ],
+    "files":[
+        "jasypt/bin/encrypt.sh"
+    ]
+}

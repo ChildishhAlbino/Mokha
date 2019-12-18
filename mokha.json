@@ -136,6 +136,7 @@
     {
       "--id": "1",
       "name": "openURL",
+      "dependency": "openURL",
       "schema": {
         "numParams": 1,
         "parameterNames": ["URL"]
@@ -144,6 +145,7 @@
     {
       "--id": "2",
       "name": "jasyptEncrypt",
+      "dependency": "encryptPasswords",
       "schema": {
         "numParams": 1,
         "parameterNames": ["clipboardContext"]
@@ -151,7 +153,8 @@
     },
     {
       "--id": "3",
-      "name": "memetext",
+      "name": "memeify",
+      "dependency": "memetext",
       "schema": {
         "numParams": 1,
         "parameterNames": ["clipboardContext"]
