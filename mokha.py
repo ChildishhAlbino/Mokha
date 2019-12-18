@@ -5,6 +5,7 @@ import importlib
 data = None
 modules = {}
 
+
 def printOptions(options, key=None):
     i = 1
     for option in options:
@@ -63,8 +64,9 @@ def getDefinitionFromModule(module, methodName):
             print("There was an attribute error.")
         except:
             print("There was some other error")
-    else: 
-        raise Exception("Couldn't find that a method with that name in the module.")
+    else:
+        raise Exception(
+            "Couldn't find that a method with that name in the module.")
 
 
 def createKWArgs(function, schema):
@@ -84,15 +86,17 @@ def createKWArgs(function, schema):
         KWArgs[parameter] = arguments[parameter]
     return KWArgs
 
+
 def importDepencies():
     dependencyJSON = None
-    with open('./dependencies.json') as file: 
+    with open('./dependencies.json') as file:
         dependencyJSON = json.load(file)
     python = dependencyJSON["python"]
     folders = dependencyJSON["folders"]
     files = dependencyJSON["files"]
-    
+
     importPythonModules(python)
+
 
 def importPythonModules(pythonDependencies):
     global modules
@@ -104,6 +108,7 @@ def importPythonModules(pythonDependencies):
             print("Loaded module: %s" % (dependency))
         except ModuleNotFoundError:
             raise Exception("Error importing python dependecies.")
+
 
 def main():
     with open('./mokha.json') as file:
@@ -120,7 +125,6 @@ def main():
         # TODO: get module from modules
         moduleName = method["dependency"]
         module = modules[moduleName]
-        print(module)
         definition = getDefinitionFromModule(
             module, method["name"])
         arguments = createKWArgs(selectedFunction, method["schema"])
