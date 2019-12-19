@@ -10,11 +10,11 @@
   },
   {
     "--id": "2",
-    "name": "jasyptEncrypt",
+    "name": "encrypt",
     "dependency": "encryptPasswords",
     "schema": {
-      "numParams": 1,
-      "parameterNames": ["clipboardContext"]
+      "numParams": 2,
+      "parameterNames": ["clipboardContext", "scriptRelPath"]
     }
   },
   {

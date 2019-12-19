@@ -1,18 +1,18 @@
 import subprocess
 import pyperclip
 import os
-template = "sh ./jasypt/bin/encrypt.sh input=%s verbose=false password=%s algorithm=PBEWITHHMACSHA512ANDAES_256 keyObtentionIterations=1000 saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator providerName=SunJCE stringOutputType=base64 ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator"
+import os.path as path
+template = "sh %s input=%s verbose=false password=%s algorithm=PBEWITHHMACSHA512ANDAES_256 keyObtentionIterations=1000 saltGeneratorClassName=org.jasypt.salt.RandomSaltGenerator providerName=SunJCE stringOutputType=base64 ivGeneratorClassName=org.jasypt.iv.RandomIvGenerator"
 
 
-def encrypt(clipboardContext=None):
+def encrypt(clipboardContext=None, scriptRelPath="./jasypt/bin/encrypt.sh"):
+    print(os.getcwd())
     password = os.environ["TINA_ADMIN_ENCRYPT_PASSWORD"]
     try:
-        to_be_encrypted = clipboardContext if(clipboardContext != None) else pyperclip.paste()
-        if(to_be_encrypted == ""):
-            raise Exception(
-                "For some reason I've got a null clipboardContext to encrypt. Das bad.")
-        filled = template % (
-            to_be_encrypted, password)
+        to_be_encrypted = clipboardContext if(
+            clipboardContext != None) else pyperclip.paste()
+        filled = template % (scriptRelPath,
+                             to_be_encrypted, password)
         print("Attemping to encrypt the value `%s` with Jasypt CLI." %
               (to_be_encrypted))
         split = filled.split()

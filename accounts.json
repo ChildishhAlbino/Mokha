@@ -72,7 +72,8 @@
       {
         "shortcutID": "8",
         "arguments": {
-          "clipboardContext": {}
+          "clipboardContext": {},
+          "scriptRelPath": "./dependencies/jasypt/bin/encrypt.sh"
         }
       },
       {
