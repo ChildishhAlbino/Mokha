@@ -1,9 +1,16 @@
 import json
 import pyperclip
 import importlib
-
+from os import path
+import subprocess
 data = None
 modules = {}
+
+
+def loadJSON(filePath):
+    with open(filePath) as file:
+        jsonData = json.load(file)
+    return jsonData
 
 
 def printOptions(options, key=None):
@@ -50,6 +57,7 @@ def getUserFunctions(shortcuts, user):
         for function in user["functions"]:
             if(shortcut["--id"] == function['shortcutID']):
                 # Makes it easier to print the options later.
+                # Hack-y solution - need to refactor language.
                 shortcut["arguments"] = function["arguments"]
                 functions.append(shortcut)
     return functions
@@ -91,11 +99,21 @@ def importDepencies():
     dependencyJSON = None
     with open('./dependencies.json') as file:
         dependencyJSON = json.load(file)
-    python = dependencyJSON["python"]
-    folders = dependencyJSON["folders"]
-    files = dependencyJSON["files"]
 
+    folders = dependencyJSON["folders"]
+    checkFileSystemDependencies(folders)
+    files = dependencyJSON["files"]
+    checkFileSystemDependencies(files)
+    python = dependencyJSON["python"]
     importPythonModules(python)
+
+
+def checkFileSystemDependencies(folderDependencies):
+    for folder in folderDependencies:
+        dependencyPath = "dependencies/%s" % (folder)
+        if(path.exists(dependencyPath) == False):
+            raise Exception("Error checking folder dependencies.")
+    print("Folder dependencies loaded successfully.")
 
 
 def importPythonModules(pythonDependencies):
@@ -111,18 +129,14 @@ def importPythonModules(pythonDependencies):
 
 
 def main():
-    with open('./mokha.json') as file:
-        data = json.load(file)
-    accounts = data["accounts"]
-    shortcuts = data["shortcuts"]
-    methods = data["methods"]
-
+    accounts = loadJSON('./accounts.json')
+    shortcuts = loadJSON('./shortcuts.json')
+    methods = loadJSON('./methods.json')
     try:
         user = getSelection(accounts, key="title")
         functions = getUserFunctions(shortcuts, user)
         selectedFunction = getSelection(functions, key="title")
         method = getShortcutMethod(methods, selectedFunction)
-        # TODO: get module from modules
         moduleName = method["dependency"]
         module = modules[moduleName]
         definition = getDefinitionFromModule(
@@ -136,12 +150,14 @@ def main():
 
 
 if __name__ == "__main__":
+    # Clears console before program output begins, makes it look nicer in terminal.
+    subprocess.run("clear")
     print("Attemping to import depencies.")
-    print("---------------------")
+    print("---------------------\n")
     try:
         importDepencies()
     except:
-        exit("Buh baiiii")
-    print("---------------------")
-    print("Welcome to Mokha V0.1-a. This is a tool designed to enable configuration of shortcuts to python code.")
+        exit("Coukd not import dependencies correctly. Please check your config.")
+    print("\n---------------------")
+    print("Welcome to Mokha V0.2-a. This is a tool designed to enable configuration of shortcuts to python code.")
     main()
