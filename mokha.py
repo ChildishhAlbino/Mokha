@@ -68,7 +68,8 @@ def getDefinitionFromModule(module, methodName):
         try:
             func = getattr(module, methodName)
             return func
-        except AttributeError:
+        except AttributeError as e:
+            print(e)
             print("There was an attribute error.")
         except:
             print("There was some other error")
@@ -112,7 +113,7 @@ def checkFileSystemDependencies(folderDependencies):
     for folder in folderDependencies:
         dependencyPath = "dependencies/%s" % (folder)
         if(path.exists(dependencyPath) == False):
-            raise Exception("Error checking folder dependencies.")
+            raise Exception("Error checking file system dependencies.")
     print("Folder dependencies loaded successfully.")
 
 
@@ -145,8 +146,8 @@ def main():
         definition(**arguments)
     except KeyboardInterrupt:
         print("You pressed Ctrl + C!")
-    except:
-        print("Whoops! I encountered an error.")
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
@@ -156,7 +157,8 @@ if __name__ == "__main__":
     print("---------------------\n")
     try:
         importDepencies()
-    except:
+    except Exception as e:
+        print(e)
         exit("Coukd not import dependencies correctly. Please check your config.")
     print("\n---------------------")
     print("Welcome to Mokha V0.2-a. This is a tool designed to enable configuration of shortcuts to python code.")
