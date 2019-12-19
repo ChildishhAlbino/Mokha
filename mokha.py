@@ -14,15 +14,13 @@ def loadJSON(filePath):
 
 
 def printOptions(options, key=None):
-    i = 1
-    for option in options:
+    for i, option in enumerate(options):
         if(key == None):
-            print("%s: %s" % (i, option))
+            print("%s: %s" % (i + 1, option))
         elif(key in option.keys()):
-            print("%s: %s" % (i, option[key]))
+            print("%s: %s" % (i + 1, option[key]))
         else:
             print("Invalid Key")
-        i = i + 1
 
 
 def getSelection(options, key=None):
