@@ -6,13 +6,35 @@ Mokha is a Python script that can be configured; via JSON, to automate workflows
 
 ## How does it work?
 
-Mokha reads in a few JSON files at startup:
+Mokha is completely configurable from JSON files. There are four main config files when using Mokha:
+
+### Base Configuration:
+
+- `config.json`: This is the first file loaded my Mokha on startup. The entire purpose of this file is configure the directories of the remaining three configuration files. The default location for all three files are the root directory of the application.
+
+### User Configuration:
 
 - `dependencies.json`: A JSON file that outlines of what files, folders, and python scripts your code requires.
 - `profiles.json`: A JSON file that outlines high-level structures that outlines different groups of methods you might have, for example: I have three profiles for Home use, Independent work use, and for my main job.
 - `methods.json`: JSON File that outlines the structure of all methods being run by Mokha.
 
-### That's cool... but what does that all mean?
+## Detailed explanation of each configuration file:
+
+### Configuration for my other configuration files, uh... why?
+
+To keep it brief, I use Mokha on a d2d basis between my work Macbook and my home Windows PC. I wanted to have a shared experience between both platforms in terms of what methods I had availablem etc.
+
+Because of this I wanted to be able to move my `User Configuration` files to dropbox. To do this, I had to create some fundamental configuration for the application that _cannot_ be moved. This is `Base Configuration` and it currently only acts as a pointer for where to find the `User Config` JSON files.
+
+```
+{
+  "config-types": {
+    "methods": "./methods.json",
+    "dependencies": "./dependencies.json",
+    "accounts": "./accounts.json"
+  }
+}
+```
 
 #### What are methods?
 
@@ -118,22 +140,19 @@ In more detail; Mokha has three types of dependencies:
 
 ### How does this look in JSON?
 
-It's really easy to setup dependencies in JSON. All dependencies of the same type are grouped into an array. Mokha automatically assumes dependencies are in the sub-directory so you need only store the relative path from there.
+It's really easy to setup dependencies in Mokha with JSON. All dependencies of the same type are grouped into an array. Mokha automatically assumes dependencies are in the sub-directory so you need only store the relative path from there.
 
 ```
 {
   "python": ["memetext", "encryptPasswords", "openURL"],
-  "folders": ["jasypt", "jasypt/bin", "jasypt/lib"],
-  "files": ["jasypt/bin/encrypt.sh"]
+  "file-system": ["jasypt", "jasypt/bin", "jasypt/lib", "jasypt/bin/encrypt.sh"]
 }
 ```
 
-Dependencies are stored in a `dependencies.json` file located in the same directory as `mokha.py`
-
 ## So why should I use this?
 
-Working in Software; both professionally and independently, I just couldn't find a tool that automated the menial, and repetitive tasks I encountered every day, and was flexible in the way I wanted.
+Working in Software; both professionally and independently, I just couldn't find a tool that automated the menial, and repetitive tasks I encountered every day, and was flexible in the way _I_ wanted.
 
-So I built Mokha. Mokha works the way YOU want it to. It's cross platform (well, it's as cross platform as the scripts you make it run.) and it's designed to be flexible about how you run it.
+So I built Mokha. Mokha works the way _YOU_ want it to. It's cross platform (well, it's as cross platform as the scripts you make it run.) and it's designed to be flexible about how you integrate it into your workflow.
 
-You can make a command line alias for it, or a keyboard shortcut, or have it run on startup. It's upto you. I still have features I want to add to refine this idea but this is a step.
+I personally have it bound to a keyboard shortcut on my work Macbook and Windows PC and it works a treat. I expect that other people will use it in a variety of ways so I've left it standalone to allow for you to integrate it the way you want.
