@@ -5,6 +5,20 @@ from os import path
 import subprocess
 data = None
 modules = {}
+userConfigDirs = {}
+
+
+def loadBaseConfig():
+    # Check config exists.
+    # Create it if it doesn't
+    # OR
+    # Load it if it does
+    configJSON = loadJSON('./config.json')
+    configTypes = configJSON["config-types"]
+    for configType in configTypes.keys():
+        print(configType)
+        userConfigDirs[configType] = configTypes[configType]
+    print(userConfigDirs)
 
 
 def loadJSON(filePath):
@@ -84,7 +98,7 @@ def createKWArgs(function, schema):
 
 def importDepencies():
     dependencyJSON = None
-    with open('./dependencies.json') as file:
+    with open(userConfigDirs["dependencies"]) as file:
         dependencyJSON = json.load(file)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
@@ -113,9 +127,9 @@ def importPythonModules(pythonDependencies):
 
 
 def main():
-    accounts = loadJSON('./accounts.json')
-    methods = loadJSON('./methods.json')
     try:
+        accounts = loadJSON(userConfigDirs["accounts"])
+        methods = loadJSON(userConfigDirs["methods"])
         user = getSelection(accounts, key="title")
         selectedFunction = getSelection(user["functions"], key="title")
         method = getMethodNameFromUserFunction(methods, selectedFunction)
