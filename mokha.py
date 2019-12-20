@@ -86,11 +86,8 @@ def importDepencies():
     dependencyJSON = None
     with open('./dependencies.json') as file:
         dependencyJSON = json.load(file)
-
-    folders = dependencyJSON["folders"]
-    checkFileSystemDependencies(folders)
-    files = dependencyJSON["files"]
-    checkFileSystemDependencies(files)
+    fileSystem = dependencyJSON["file-system"]
+    checkFileSystemDependencies(fileSystem)
     python = dependencyJSON["python"]
     importPythonModules(python)
 
@@ -100,7 +97,7 @@ def checkFileSystemDependencies(folderDependencies):
         dependencyPath = "dependencies/%s" % (folder)
         if(path.exists(dependencyPath) == False):
             raise Exception("Error checking file system dependencies.")
-    print("Folder dependencies loaded successfully.")
+    print("Filesystem dependencies loaded successfully.")
 
 
 def importPythonModules(pythonDependencies):
@@ -122,14 +119,11 @@ def main():
         user = getSelection(accounts, key="title")
         selectedFunction = getSelection(user["functions"], key="title")
         method = getMethodNameFromUserFunction(methods, selectedFunction)
-
         moduleName = method["dependency"]
         module = modules[moduleName]
-
         definition = getDefinitionFromModule(
             module, method["name"])
         arguments = createKWArgs(selectedFunction, method["schema"])
-
         definition(**arguments)
     except KeyboardInterrupt:
         print("You pressed Ctrl + C!")
@@ -140,6 +134,7 @@ def main():
 if __name__ == "__main__":
     # Clears console before program output begins, makes it look nicer in terminal.
     subprocess.run("clear")
+    loadBaseConfig()
     print("Attemping to import depencies.")
     print("---------------------\n")
     try:
@@ -148,5 +143,5 @@ if __name__ == "__main__":
         print(e)
         exit("Coukd not import dependencies correctly. Please check your config.")
     print("\n---------------------")
-    print("Welcome to Mokha V0.2-a. This is a tool designed to enable configuration of shortcuts to python code.")
+    print("Welcome to Mokha V1.0-a. This is a tool designed to enable configuration of shortcuts to python code.")
     main()
