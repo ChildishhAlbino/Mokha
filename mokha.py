@@ -41,24 +41,12 @@ def getSelection(options, key=None):
         print("I got an error... I sense a disturbance in the force.")
 
 
-def getShortcutMethod(methods, function):
+def getMethodNameFromUserFunction(methods, function):
     for method in methods:
         if(method["--id"] == function["methodID"]):
             return method
     else:
         return "closeSafely"
-
-
-def getUserFunctions(shortcuts, user):
-    functions = []
-    for shortcut in shortcuts:
-        for function in user["functions"]:
-            if(shortcut["--id"] == function['shortcutID']):
-                # Makes it easier to print the options later.
-                # Hack-y solution - need to refactor language.
-                shortcut["arguments"] = function["arguments"]
-                functions.append(shortcut)
-    return functions
 
 
 def getDefinitionFromModule(module, methodName):
@@ -129,18 +117,19 @@ def importPythonModules(pythonDependencies):
 
 def main():
     accounts = loadJSON('./accounts.json')
-    shortcuts = loadJSON('./shortcuts.json')
     methods = loadJSON('./methods.json')
     try:
         user = getSelection(accounts, key="title")
-        functions = getUserFunctions(shortcuts, user)
-        selectedFunction = getSelection(functions, key="title")
-        method = getShortcutMethod(methods, selectedFunction)
+        selectedFunction = getSelection(user["functions"], key="title")
+        method = getMethodNameFromUserFunction(methods, selectedFunction)
+
         moduleName = method["dependency"]
         module = modules[moduleName]
+
         definition = getDefinitionFromModule(
             module, method["name"])
         arguments = createKWArgs(selectedFunction, method["schema"])
+
         definition(**arguments)
     except KeyboardInterrupt:
         print("You pressed Ctrl + C!")
