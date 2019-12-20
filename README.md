@@ -1,2 +1,139 @@
-# Mokha
-A python script that lets you configure shortcuts to run easier. Further documentation to come.
+# Mokha: Workflow Automator.
+
+## What is Mokha?
+
+Mokha is a Python script that can be configured; via JSON, to automate workflows.
+
+## How does it work?
+
+Mokha reads in a few JSON files at startup:
+
+- `dependencies.json`: A JSON file that outlines of what files, folders, and python scripts your code requires.
+- `profiles.json`: A JSON file that outlines high-level structures that outlines different groups of methods you might have, for example: I have three profiles for Home use, Independent work use, and for my main job.
+- `methods.json`: JSON File that outlines the structure of all methods being run by Mokha.
+
+### That's cool... but what does that all mean?
+
+#### What are methods?
+
+Methods are simply the outline of a method in a Python Module. Looks as follows.
+
+For the following Python method:
+
+```
+def openURL(URL="https://www.google.com.au"):
+    webbrowser.open(URL)
+```
+
+```
+{
+    "--id": "1",
+    "name": "openURL",
+    "dependency": "openURL",
+    "schema": {
+      "numParams": 1,
+      "parameterNames": ["URL"]
+    }
+  },
+```
+
+Field descriptions:
+
+- `--id`: Some unique ID for this specific method definition. Helps keep things modular.
+- `name`: This the name of the method in Python you are defining in the Mokha configuration file. This IS case sensitive.
+- `dependency`: This is the name of Python module you are importing to run this. You always need 1 dependency - this will be elaborated in a section below.
+- `schema`: This is an object that verifies that a shortcut that calls this method is passing the correct arguments.
+  - `numParams`: This outlines the number of parameters this method expects. This will be made optional in the future.
+  - `parameterNames`: An array of string that outline the expected arguments.
+
+Methods are the most atomic thing in Mokha and everything going forward will be building on them.
+
+#### What are profiles:
+
+Profiles are a way of separating instances of methods for different workflows.
+
+Below is the configuration for a single profile.
+
+```
+{
+    "--id": "1",
+    "title": "Personal",
+    "functions": [
+      {
+        "title": "Google Calendar",
+        "methodID": "1",
+        "arguments": {
+          "URL": "https://calendar.google.com/calendar/b/0/r/month"
+        }
+      },
+      {
+        "title": "GitHub Profile",
+        "methodID": "1",
+        "arguments": {
+          "URL": "https://github.com/ChildishhAlbino"
+        }
+      },
+      {
+        "title": "Personal Blog",
+        "methodID": "1",
+        "arguments": {
+          "URL": "https://childishhalbino.github.io/"
+        }
+      }
+    ]
+  },
+```
+
+A profile has the following fields:
+
+- `--id`: A unique identifier for this profile.
+- `title`: A title for the profile. This gets printed to the console.
+- `functions`: An array of function objects that detail the method being called and the arguments being passed for this option.
+  - `function`: A function object looks like this:
+  ```
+  {
+        "title": "Google Calendar",
+        "methodID": "1",
+        "arguments": {
+          "URL": "https://calendar.google.com/calendar/b/0/r/month"
+        }
+      },
+  ```
+  A function object has the following fields:
+  - `title`: This is the name of the function.
+  - `methodID`: This is a reference to the ID of the method this function calls.
+  - `arguments`: A JSON object that has keys that equal the parameters names outline in this method's configuration. The value of said key is the argument that will be passed to the method call.
+
+## Setting up dependencies
+
+### What are dependencies in Mokha?
+
+In short, everything is a dependency. Mokha runs your scripts for you. You write a Python script that does what you want it to do, put it in the dependencies of Mokha, and configure it and you're done.
+
+In more detail; Mokha has three types of dependencies:
+
+- `Python`: These are Python modules you're configuring Mokha to run methods from.
+- `Folders`: These are folders that need to exist inside the dependencies subdirectory. It's a good way to make sure external resources that your modules may rely on are also present.
+- `Files`: The same principal as above but for files. _This is potentially being refactored into one dependency object_
+
+### How does this look in JSON?
+
+It's really easy to setup dependencies in JSON. All dependencies of the same type are grouped into an array. Mokha automatically assumes dependencies are in the sub-directory so you need only store the relative path from there.
+
+```
+{
+  "python": ["memetext", "encryptPasswords", "openURL"],
+  "folders": ["jasypt", "jasypt/bin", "jasypt/lib"],
+  "files": ["jasypt/bin/encrypt.sh"]
+}
+```
+
+Dependencies are stored in a `dependencies.json` file located in the same directory as `mokha.py`
+
+## So why should I use this?
+
+Working in Software; both professionally and independently, I just couldn't find a tool that automated the menial, and repetitive tasks I encountered every day, and was flexible in the way I wanted.
+
+So I built Mokha. Mokha works the way YOU want it to. It's cross platform (well, it's as cross platform as the scripts you make it run.) and it's designed to be flexible about how you run it.
+
+You can make a command line alias for it, or a keyboard shortcut, or have it run on startup. It's upto you. I still have features I want to add to refine this idea but this is a step.
