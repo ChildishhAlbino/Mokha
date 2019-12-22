@@ -11,6 +11,7 @@ modules = {}
 baseConfig = {}
 application_path = ""
 
+
 def loadBaseConfig():
     # Check config exists.
     # Create it if it doesn't
@@ -21,6 +22,7 @@ def loadBaseConfig():
     for configType in configTypes.keys():
         baseConfig[configType] = configTypes[configType]
     baseConfig["dependencies-path"] = configJSON["dependencies-path"]
+
 
 def loadJSON(filePath):
     with open(filePath) as file:
@@ -157,7 +159,8 @@ if __name__ == "__main__":
     loadBaseConfig()
     # Ensures python can see dependencies outside of root dir.
     sys.path.append(baseConfig['dependencies-path'])
-    print("Attemping to import depencies from: %s" % (baseConfig['dependencies-path'])) 
+    print("Attemping to import depencies from: %s" %
+          (baseConfig['dependencies-path']))
     print("---------------------\n")
     try:
         importDepencies()
