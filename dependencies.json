@@ -1,4 +1,0 @@
-{
-  "python": ["memetext", "encryptPasswords", "openURL"],
-  "file-system": ["jasypt", "jasypt/bin", "jasypt/lib", "jasypt/bin/encrypt.sh"]
-}
