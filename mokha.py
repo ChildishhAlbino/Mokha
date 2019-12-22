@@ -108,7 +108,7 @@ def createKWArgs(function, schema):
     return KWArgs
 
 
-def importDepencies():
+def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
@@ -137,7 +137,7 @@ def importPythonModules(pythonDependencies):
             print("Loaded module: %s" % (dependency))
         except ModuleNotFoundError as e:
             print(e)
-            raise Exception("Error importing python dependecies.")
+            raise Exception("Error importing python dependencies.")
 
 
 def main():
@@ -168,11 +168,11 @@ if __name__ == "__main__":
     loadBaseConfig()
     # Ensures python can see dependencies outside of root dir.
     sys.path.append(baseConfig['dependencies-path'])
-    print("Attemping to import depencies from: %s" %
+    print("Attempting to import dependencies from: %s" %
           (baseConfig['dependencies-path']))
     print("---------------------\n")
     try:
-        importDepencies()
+        importDependencies()
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")

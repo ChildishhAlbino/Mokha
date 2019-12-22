@@ -1,4 +1,4 @@
-# Mokha: Workflow Automator
+# Mokha: Workflow Automation
 
 ## What is Mokha
 
@@ -35,8 +35,8 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
 ## Setting up Mokha
 
 1. Clone this repo and run `pip install click` and `pip install pyperclip`. _If that doesn't work try `pip3` instead_
-2. Run Mokha.py. It will autogenerate the config.json file with the default values, however, it will not generate those files/folders for you.
-3. Create `accounts.json`, `methods.json` and `dependecies.json` files and a `dependecies` folder wherever you want. If you deviate from the default values in `config.json` please update them there.  
+2. Run Mokha.py. It will automatically generate the config.json file with the default values, however, it will not generate those files/folders for you.
+3. Create `accounts.json`, `methods.json` and `dependencies.json` files and a `dependencies` folder wherever you want. If you deviate from the default values in `config.json` please update them there.  
    NOTE: Please put the _absolute_ path for any files or directories outside of the root directory.
 
 4. Add an account to the `accounts.json` file as follows:
@@ -168,7 +168,7 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
 7. That's it! You can run Mokha.py and it _should_ (fingers crossed) work. You should get some console output like this:
 
    ```None
-   Attemping to import depencies from: E:/Documents/Dropbox/Mokha/dependencies
+   Attempting to import dependencies from: E:/Documents/Dropbox/Mokha/dependencies
    ---------------------
 
    Filesystem dependencies loaded successfully.
@@ -183,7 +183,7 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
    Upon selecting a language, you should see this:
 
    ```None
-   Attemping to import depencies from: E:/Documents/Dropbox/Mokha/dependencies
+   Attempting to import dependencies from: E:/Documents/Dropbox/Mokha/dependencies
    ---------------------
 
    Filesystem dependencies loaded successfully.
@@ -219,7 +219,7 @@ The basic flow of the application is as follows:
 
 4. Mokha then prompts the user for input on which account they want to access.
 
-5. Mokha takes the input and finds the `account` that matches it, it then finds all the `functions` asscociated with it.
+5. Mokha takes the input and finds the `account` that matches it, it then finds all the `functions` associated with it.
 
 6. The application will prompt the user for input for which function they want to run and then finds it from their config.
 
@@ -227,9 +227,9 @@ The basic flow of the application is as follows:
 
 8. Mokha constructs a dictionary with keys that equal the parameters outlined in the method's `schema` object and maps them to the selected functions `arguments` object.
 
-9. Mokha changes the current directory to the `depedencies-path` value. This is to ensure that a user's scripts function as they would if they were run in isolation.
+9. Mokha changes the current directory to the `dependencies-path` value. This is to ensure that a user's scripts function as they would if they were run in isolation.
 
-10. This dictionary is then passed as the argument to the Python function call and thanks to keyword-arguments; as long as the dictionary does not have any keys that aren't a paramater on the method (in code), the function should be called without any issues.
+10. This dictionary is then passed as the argument to the Python function call and thanks to keyword-arguments; as long as the dictionary does not have any keys that aren't a parameter on the method (in code), the function should be called without any issues.
 
 (_Hopefully that made sense_ 😂)
 
@@ -239,11 +239,11 @@ Working in Software; both professionally and independently, I just couldn't find
 
 So I built Mokha. Mokha works the way _YOU_ want it to. It's cross platform (well, it's as cross platform as the scripts you make it run.) and it's designed to be flexible about how you integrate it into your workflow.
 
-I personally have it bound to a keyboard shortcut on my work Macbook and Windows PC and it works a treat. I expect that other people will use it in a variety of ways so I've left it standalone to allow for you to integrate it the way you want.
+I personally have it bound to a keyboard shortcut on my work MacBook and Windows PC and it works a treat. I expect that other people will use it in a variety of ways so I've left it standalone to allow for you to integrate it the way you want.
 
 ## Further integration with Mokha
 
-So far, there's one small convennience I've added to Mokha that is completely optional for you to implement. If a script you want to run requires text from the clipboard, you can set a paramater to `clipboardContext` as follows:
+So far, there's one small convenience I've added to Mokha that is completely optional for you to implement. If a script you want to run requires text from the clipboard, you can set a parameter to `clipboardContext` as follows:
 
 ```Python
 def memeify(clipboardContext=None):
