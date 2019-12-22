@@ -12,16 +12,25 @@ baseConfig = {}
 application_path = ""
 
 
+def createBaseConfig():
+    configTypes = {"methods": "./methods.json",
+                   "accounts": "./accounts.json", "dependencies": "./dependencies.json"}
+    baseConfig = {"config-types": configTypes,
+                  "dependencies-path": "./dependencies"}
+    with open("./config.json", "w") as f:
+        json.dump(baseConfig, f, indent=2)
+
+
 def loadBaseConfig():
-    # Check config exists.
-    # Create it if it doesn't
-    # OR
-    # Load it if it does
-    configJSON = loadJSON('./config.json')
-    configTypes = configJSON["config-types"]
-    for configType in configTypes.keys():
-        baseConfig[configType] = configTypes[configType]
-    baseConfig["dependencies-path"] = configJSON["dependencies-path"]
+    if not (path.exists("./config.json")):
+        createBaseConfig()
+        raise Exception("Closing so you can configure application.")
+    else:
+        configJSON = loadJSON('./config.json')
+        configTypes = configJSON["config-types"]
+        for configType in configTypes.keys():
+            baseConfig[configType] = configTypes[configType]
+        baseConfig["dependencies-path"] = configJSON["dependencies-path"]
 
 
 def loadJSON(filePath):
