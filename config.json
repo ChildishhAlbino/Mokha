@@ -1,7 +1,0 @@
-{
-  "config-types": {
-    "methods": "./methods.json",
-    "dependencies": "./dependencies.json",
-    "accounts": "./accounts.json"
-  }
-}
