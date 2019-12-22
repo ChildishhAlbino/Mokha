@@ -129,3 +129,6 @@ dmypy.json
 
 # IDE Stuff
 .vscode/
+
+# Mokha Stuff
+config.json
