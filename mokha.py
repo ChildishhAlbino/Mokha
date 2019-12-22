@@ -6,6 +6,7 @@ import platform
 import sys
 from click import clear
 from os import path, chdir, getcwd, system
+from pathlib import Path as FilePath
 data = None
 modules = {}
 baseConfig = {}
@@ -162,6 +163,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # Sets the current directory to the root folder of this script.
+    chdir(FilePath(path.abspath(__file__)).parent)
     application_path = getcwd()
     # Clears console before program output begins, makes it look nicer in terminal.
     clear()
