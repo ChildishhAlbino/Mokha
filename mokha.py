@@ -1,12 +1,15 @@
 import json
 import pyperclip
 import importlib
-from os import path
 import subprocess
+import platform
+import sys
+from click import clear
+from os import path, chdir, getcwd, system
 data = None
 modules = {}
-userConfigDirs = {}
-
+baseConfig = {}
+application_path = ""
 
 def loadBaseConfig():
     # Check config exists.
@@ -16,10 +19,8 @@ def loadBaseConfig():
     configJSON = loadJSON('./config.json')
     configTypes = configJSON["config-types"]
     for configType in configTypes.keys():
-        print(configType)
-        userConfigDirs[configType] = configTypes[configType]
-    print(userConfigDirs)
-
+        baseConfig[configType] = configTypes[configType]
+    baseConfig["dependencies-path"] = configJSON["dependencies-path"]
 
 def loadJSON(filePath):
     with open(filePath) as file:
@@ -98,7 +99,7 @@ def createKWArgs(function, schema):
 
 def importDepencies():
     dependencyJSON = None
-    with open(userConfigDirs["dependencies"]) as file:
+    with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
@@ -107,29 +108,31 @@ def importDepencies():
 
 
 def checkFileSystemDependencies(folderDependencies):
+    chdir(baseConfig["dependencies-path"])
     for folder in folderDependencies:
-        dependencyPath = "dependencies/%s" % (folder)
+        dependencyPath = "%s" % (folder)
         if(path.exists(dependencyPath) == False):
             raise Exception("Error checking file system dependencies.")
     print("Filesystem dependencies loaded successfully.")
+    chdir(application_path)
 
 
 def importPythonModules(pythonDependencies):
-    global modules
     for dependency in pythonDependencies:
         try:
-            moduleImport = "dependencies." + dependency
+            moduleImport = dependency
             module = importlib.import_module(moduleImport)
             modules[dependency] = module
             print("Loaded module: %s" % (dependency))
-        except ModuleNotFoundError:
+        except ModuleNotFoundError as e:
+            print(e)
             raise Exception("Error importing python dependecies.")
 
 
 def main():
     try:
-        accounts = loadJSON(userConfigDirs["accounts"])
-        methods = loadJSON(userConfigDirs["methods"])
+        accounts = loadJSON(baseConfig["accounts"])
+        methods = loadJSON(baseConfig["methods"])
         user = getSelection(accounts, key="title")
         selectedFunction = getSelection(user["functions"], key="title")
         method = getMethodNameFromUserFunction(methods, selectedFunction)
@@ -138,6 +141,8 @@ def main():
         definition = getDefinitionFromModule(
             module, method["name"])
         arguments = createKWArgs(selectedFunction, method["schema"])
+        # Changes the cwd to the dependencies path so module is run as if it were run in isolation.
+        chdir(baseConfig["dependencies-path"])
         definition(**arguments)
     except KeyboardInterrupt:
         print("You pressed Ctrl + C!")
@@ -146,10 +151,13 @@ def main():
 
 
 if __name__ == "__main__":
+    application_path = getcwd()
     # Clears console before program output begins, makes it look nicer in terminal.
-    subprocess.run("clear")
+    clear()
     loadBaseConfig()
-    print("Attemping to import depencies.")
+    # Ensures python can see dependencies outside of root dir.
+    sys.path.append(baseConfig['dependencies-path'])
+    print("Attemping to import depencies from: %s" % (baseConfig['dependencies-path'])) 
     print("---------------------\n")
     try:
         importDepencies()
