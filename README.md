@@ -240,3 +240,42 @@ Working in Software; both professionally and independently, I just couldn't find
 So I built Mokha. Mokha works the way _YOU_ want it to. It's cross platform (well, it's as cross platform as the scripts you make it run.) and it's designed to be flexible about how you integrate it into your workflow.
 
 I personally have it bound to a keyboard shortcut on my work Macbook and Windows PC and it works a treat. I expect that other people will use it in a variety of ways so I've left it standalone to allow for you to integrate it the way you want.
+
+## Further integration with Mokha
+
+So far, there's one small convennience I've added to Mokha that is completely optional for you to implement. If a script you want to run requires text from the clipboard, you can set a paramater to `clipboardContext` as follows:
+
+```Python
+def memeify(clipboardContext=None):
+    string = clipboardContext if(clipboardContext != None) else pyperclip.paste()
+    string2 = ""
+    for c in string:
+        string2 = string2 + c + " "
+    pyperclip.copy(string2.strip())
+```
+
+and the configuration in JSON is as such:
+
+```JSON
+      {
+        "title": "Memeify the clipboard text.",
+        "methodID": "memeify-the-text",
+        "arguments": {
+          "clipboardContext": {}
+        }
+      }
+```
+
+```JSON
+ {
+    "--id": "memeify-the-text",
+    "name": "memeify",
+    "dependency": "memetext",
+    "schema": {
+      "numParams": 1,
+      "parameterNames": ["clipboardContext"]
+    }
+  }
+```
+
+Mokha will then pass the value of the clipboard (via `pyperclip.paste()`) into the value of `clipboardContext` during Step 8 of the application's flow.
