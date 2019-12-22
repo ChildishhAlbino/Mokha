@@ -34,7 +34,7 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
 
 ## Setting up Mokha:
 
-Clone this repo
+1. Clone this repo and run Mokha.py. It will autogenerate the config.json file with the default values.
 
 ## So why should I use this?
 
