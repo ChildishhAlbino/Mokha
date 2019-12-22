@@ -1,5 +1,7 @@
 # Mokha: Workflow Automation
 
+![Mokha-logo](https://i.imgur.com/wHj0zg0.png)
+
 ## What is Mokha
 
 Mokha is a Python script that can be configured; via JSON, to automate workflows.
