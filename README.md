@@ -126,7 +126,6 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
        "schema": {
        "numParams": 1,
        "parameterNames": ["URL"]
-       }
    }
    ```
 
