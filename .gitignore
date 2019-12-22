@@ -132,3 +132,4 @@ dmypy.json
 
 # Mokha Stuff
 config.json
+/dependencies
