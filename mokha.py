@@ -116,18 +116,21 @@ def createKWArgs(function, schema):
 def copyRemoteDependencies(remoteDependencies):
     for remoteDependency in remoteDependencies:
         # check if file exists in dependencies folder
-        remoteFileName = ntpath.basename(remoteDependency)
-        # compare equality
-        localFilePath = "%s/%s" % (
-            baseConfig["dependencies-path"], remoteFileName)
-        filesEqual = cmp(remoteDependency, localFilePath)
-        updateDependency = True
-        if(path.exists(localFilePath)):
-            if (filesEqual):
-                updateDependency = False
-        if (updateDependency):
-            print("COPYING REMOTE DEPENDENCY:\n%s" % (remoteDependency))
-            copyfile(remoteDependency, localFilePath)
+        try:
+            remoteFileName = ntpath.basename(remoteDependency)
+            # compare equality
+            localFilePath = "%s/%s" % (
+                baseConfig["dependencies-path"], remoteFileName)
+            filesEqual = cmp(remoteDependency, localFilePath)
+            updateDependency = True
+            if(path.exists(localFilePath)):
+                if (filesEqual):
+                    updateDependency = False
+            if (updateDependency):
+                print("COPYING REMOTE DEPENDENCY:\n%s" % (remoteDependency))
+                copyfile(remoteDependency, localFilePath)
+        except Exception as e:
+            print(e)
 
 
 def importDependencies():
