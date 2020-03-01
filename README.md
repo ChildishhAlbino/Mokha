@@ -147,24 +147,27 @@ The reason for splitting the types of configuration is simple. `Base Config` enc
    ```JSON
    {
    "python": [],
-   "file-system": []
+   "file-system": [],
+   "remote": []
    }
    ```
 
    As you can see, there are two fields for different types of dependencies.
 
    - `python`: Dependencies on Python modules or `.py` files.
-   - `file-system`: Dependencies on any external files your Python modules may use to achieve their goals.  
+   - `file-system`: Dependencies on any files your Python modules may use to achieve their goals.  
      NOTE: All file paths stored here can be either absolute or relative to the `dependencies` path.
+   - `remote`: Remote dependencies are files on your PC that may not be best suited stored in your dependencies folder for whatever reason. By putting the absolute path of this file here, Mokha will check said path and copy over the file if it doesn't exist or if the remote version does not match the current version byte-for-byte.
 
-   For the purposes of our `utilities.py` module, we just have to modify the `python` dependencies as follows:
+For the purposes of our `utilities.py` module, we just have to modify the `python` dependencies as follows:
 
-   ```JSON
-   {
-   "python": ["utilities"],
-   "file-system": []
-   }
-   ```
+```JSON
+{
+"python": ["utilities"],
+"file-system": [],
+"remote": []
+}
+```
 
 7. That's it! You can run Mokha.py and it _should_ (fingers crossed) work. You should get some console output like this:
 
