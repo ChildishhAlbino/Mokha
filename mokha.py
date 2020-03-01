@@ -200,5 +200,5 @@ if __name__ == "__main__":
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
     print("\n---------------------")
-    print("Welcome to Mokha V1.0-a. This is a tool designed to enable configuration of shortcuts to python code.")
+    print("Welcome to Mokha V1.1. This is a tool designed to enable configuration of shortcuts to python code.")
     main()
