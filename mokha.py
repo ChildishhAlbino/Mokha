@@ -121,10 +121,12 @@ def copyRemoteDependencies(remoteDependencies):
         localFilePath = "%s/%s" % (
             baseConfig["dependencies-path"], remoteFileName)
         filesEqual = cmp(remoteDependency, localFilePath)
-        if (not filesEqual):
-            # if equal, skip,
-            # if not equal, copy the remote dependency
-            print("COPYING remote dependency: %s" % (remoteDependency))
+        updateDependency = True
+        if(path.exists(localFilePath)):
+            if (filesEqual):
+                updateDependency = False
+        if (updateDependency):
+            print("COPYING REMOTE DEPENDENCY:\n%s" % (remoteDependency))
             copyfile(remoteDependency, localFilePath)
 
 
