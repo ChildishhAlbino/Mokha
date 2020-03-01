@@ -140,12 +140,10 @@ def importDependencies():
     importPythonModules(python)
 
 
-def checkFileSystemDependencies(folderDependencies):
-    # TODO: Refactor
+def checkFileSystemDependencies(fileSystemDependencies):
     chdir(baseConfig["dependencies-path"])
-    for folder in folderDependencies:
-        dependencyPath = "%s" % (folder)
-        if(path.exists(dependencyPath) == False):
+    for fileSystemDependency in fileSystemDependencies:
+        if(path.exists(fileSystemDependency) == False):
             raise Exception("Error checking file system dependencies.")
     print("Filesystem dependencies loaded successfully.")
     chdir(application_path)
