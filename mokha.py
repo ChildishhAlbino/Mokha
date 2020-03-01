@@ -4,9 +4,13 @@ import importlib
 import subprocess
 import platform
 import sys
+import ntpath
 from click import clear
 from os import path, chdir, getcwd, system
 from pathlib import Path as FilePath
+from filecmp import cmp
+from shutil import copyfile
+
 data = None
 modules = {}
 baseConfig = {}
@@ -109,10 +113,27 @@ def createKWArgs(function, schema):
     return KWArgs
 
 
+def copyRemoteDependencies(remoteDependencies):
+    for remoteDependency in remoteDependencies:
+        # check if file exists in dependencies folder
+        remoteFileName = ntpath.basename(remoteDependency)
+        # compare equality
+        localFilePath = "%s/%s" % (
+            baseConfig["dependencies-path"], remoteFileName)
+        filesEqual = cmp(remoteDependency, localFilePath)
+        if (not filesEqual):
+            # if equal, skip,
+            # if not equal, copy the remote dependency
+            print("COPYING remote dependency: %s" % (remoteDependency))
+            copyfile(remoteDependency, localFilePath)
+
+
 def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
+    remote = dependencyJSON["remote"]
+    copyRemoteDependencies(remote)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
     python = dependencyJSON["python"]
@@ -120,6 +141,7 @@ def importDependencies():
 
 
 def checkFileSystemDependencies(folderDependencies):
+    # TODO: Refactor
     chdir(baseConfig["dependencies-path"])
     for folder in folderDependencies:
         dependencyPath = "%s" % (folder)
@@ -171,7 +193,7 @@ if __name__ == "__main__":
     loadBaseConfig()
     # Ensures python can see dependencies outside of root dir.
     sys.path.append(baseConfig['dependencies-path'])
-    print("Attempting to import dependencies from: %s" %
+    print("Attempting to import dependencies from:\n%s" %
           (baseConfig['dependencies-path']))
     print("---------------------\n")
     try:
