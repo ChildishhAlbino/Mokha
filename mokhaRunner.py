@@ -102,7 +102,12 @@ def checkPipDependencies(pipPackages):
             raise Exception(
                 "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
     print(" ".join(installCmd))
-    subprocess.run(installCmd)
+    try:
+        subprocess.run(installCmd)
+    except Exception as e:
+        print(e)
+        print("Error with installing Pip dependencies.")
+        exit()
 
 
 def importPythonModules(pythonDependencies):
