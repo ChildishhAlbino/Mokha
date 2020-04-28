@@ -5,7 +5,7 @@ from filecmp import cmp
 import importlib
 import sys
 from shutil import copyfile
-
+import subprocess
 
 modules = {}
 baseConfig = {}
@@ -68,6 +68,8 @@ def importDependencies():
     copyRemoteDependencies(remote)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
+    pip = dependencyJSON["pip"]
+    checkPipDependencies(pip)
     python = dependencyJSON["python"]
     importPythonModules(python)
 
@@ -85,6 +87,22 @@ def importMokhaEngine():
     print("Importing Mokha Engine.")
     mokhaEngine = importlib.import_module("mokhaEngine")
     modules["mokhaEngine"] = mokhaEngine
+
+
+def checkPipDependencies(pipPackages):
+    installCmd = ["pip", "install"]
+    for pipPackage in pipPackages:
+        pipType = type(pipPackage)
+        if (pipType == dict):
+            installCmd.append("'%s==%s'" % (
+                pipPackage["package-name"], pipPackage["version"]))
+        elif (pipType == str):
+            installCmd.append(pipPackage)
+        else:
+            raise Exception(
+                "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
+    print(" ".join(installCmd))
+    subprocess.run(installCmd)
 
 
 def importPythonModules(pythonDependencies):
