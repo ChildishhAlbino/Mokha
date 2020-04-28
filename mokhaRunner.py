@@ -1,4 +1,4 @@
-from os import path, chdir, getcwd
+from os import path, chdir, getcwd, system
 from pathlib import Path as FilePath
 import json
 from filecmp import cmp
@@ -71,6 +71,7 @@ def importDependencies():
     checkFileSystemDependencies(fileSystem)
     pip = dependencyJSON["pip"]
     checkPipDependencies(pip)
+    system('cls||clear')
     python = dependencyJSON["python"]
     importPythonModules(python)
 
@@ -122,6 +123,7 @@ def checkPipDependencies(pipPackages):
         print(e)
         print("Error with installing Pip dependencies.")
         exit()
+    
 
 
 def importPythonModules(pythonDependencies):
