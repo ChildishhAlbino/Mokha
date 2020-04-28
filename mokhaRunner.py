@@ -1,10 +1,12 @@
-from mokhaEngine import main as MokhaMain
+# from mokhaEngine import main as MokhaMain
 from os import path, chdir, getcwd
 from pathlib import Path as FilePath
 import json
 from filecmp import cmp
 import importlib
 import sys
+from shutil import copyfile
+
 
 modules = {}
 baseConfig = {}
@@ -89,6 +91,7 @@ def importPythonModules(pythonDependencies):
             print("Loaded module: %s" % (dependency))
         except ModuleNotFoundError as e:
             print(e)
+            print("Problematic Module == %s" % (dependency))
             raise Exception("Error importing python dependencies.")
 
 
@@ -115,7 +118,8 @@ def main():
 
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
-    MokhaMain(baseConfig, accounts, methods, modules)
+    print([baseConfig, accounts, methods, modules])
+    # MokhaMain(baseConfig, accounts, methods, modules)
 
 
 if (__name__ == "__main__"):

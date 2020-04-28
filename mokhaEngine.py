@@ -6,7 +6,7 @@ import sys
 from click import clear
 from os import path, chdir, getcwd, system
 from pathlib import Path as FilePath
-from shutil import copyfile
+
 
 
 def printOptions(options, key=None):
