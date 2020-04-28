@@ -6,6 +6,7 @@ import importlib
 import sys
 from shutil import copyfile
 import subprocess
+from re import compile
 
 modules = {}
 baseConfig = {}
@@ -90,20 +91,33 @@ def importMokhaEngine():
 
 
 def checkPipDependencies(pipPackages):
+    pipList = subprocess.run(
+        "pip list".split(), stdout=subprocess.PIPE).stdout.decode('utf-8').lower()
     installCmd = ["pip", "install"]
     for pipPackage in pipPackages:
         pipType = type(pipPackage)
         if (pipType == dict):
-            installCmd.append("'%s==%s'" % (
-                pipPackage["package-name"], pipPackage["version"]))
+            regexPattern = "%s\\s+%s" % (
+                pipPackage["package-name"], pipPackage["version"])
+            regex = compile(regexPattern)
+            installed = regex.search(pipList) != None
+            if(not installed):
+                installCmd.append("%s==%s" % (
+                    pipPackage["package-name"], pipPackage["version"]))
         elif (pipType == str):
-            installCmd.append(pipPackage)
+            regexPattern = "%s\\s+" % (
+                pipPackage)
+            regex = compile(regexPattern)
+            installed = regex.search(pipList) != None
+            if(not installed):
+                installCmd.append(pipPackage)
         else:
             raise Exception(
                 "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
-    print(" ".join(installCmd))
     try:
-        subprocess.run(installCmd)
+        if (len(installCmd) > 2):
+            print(" ".join(installCmd))
+            subprocess.run(installCmd)
     except Exception as e:
         print(e)
         print("Error with installing Pip dependencies.")
@@ -112,16 +126,19 @@ def checkPipDependencies(pipPackages):
 
 def importPythonModules(pythonDependencies):
     importMokhaEngine()
+    outputStrings = []
     for dependency in pythonDependencies:
         try:
             moduleImport = dependency
             module = importlib.import_module(moduleImport)
             modules[dependency] = module
-            print("Loaded module: %s" % (dependency))
+            outputStrings.append("Loaded module: %s" % (dependency))
         except ModuleNotFoundError as e:
             print(e)
+            print("\n".join(outputStrings))
             print("Problematic Module == %s" % (dependency))
             raise Exception("Error importing python dependencies.")
+    print("\n".join(outputStrings))
 
 
 def setup():
