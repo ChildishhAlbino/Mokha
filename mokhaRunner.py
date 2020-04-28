@@ -160,7 +160,7 @@ def main():
     print("Attempting to import dependencies from:\n%s" %
           (baseConfig['dependencies-path']))
     print("\n---------------------")
-    print("Welcome to Mokha V1.1. This is a tool designed to enable configuration of shortcuts to python code.")
+    print("Welcome to Mokha V2.0! This is a tool designed to enable configuration of shortcuts to python code.")
 
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
