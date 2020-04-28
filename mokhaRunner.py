@@ -1,4 +1,3 @@
-# from mokhaEngine import main as MokhaMain
 from os import path, chdir, getcwd
 from pathlib import Path as FilePath
 import json
@@ -82,7 +81,14 @@ def checkFileSystemDependencies(fileSystemDependencies):
     chdir(application_path)
 
 
+def importMokhaEngine():
+    print("Importing Mokha Engine.")
+    mokhaEngine = importlib.import_module("mokhaEngine")
+    modules["mokhaEngine"] = mokhaEngine
+
+
 def importPythonModules(pythonDependencies):
+    importMokhaEngine()
     for dependency in pythonDependencies:
         try:
             moduleImport = dependency
@@ -118,8 +124,10 @@ def main():
 
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
-    print([baseConfig, accounts, methods, modules])
-    # MokhaMain(baseConfig, accounts, methods, modules)
+    kwargs = {"baseConfig": baseConfig, "accounts": accounts,
+              "methods": methods, "modules": modules}
+    mokhaEngine = modules["mokhaEngine"]
+    mokhaEngine.main(**kwargs)
 
 
 if (__name__ == "__main__"):
