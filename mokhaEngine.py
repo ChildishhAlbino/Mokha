@@ -29,7 +29,7 @@ def getDefinitionFromModule(module, methodName):
             print("There was some other error")
     else:
         raise Exception(
-            "Couldn't find that a method with that name in the module.")
+            "Couldn't find a method with that name in the module.")
 
 
 def createKWArgs(function, schema):
