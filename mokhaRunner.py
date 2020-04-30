@@ -130,7 +130,7 @@ def checkPipDependencies(pipPackages):
     try:
         if (len(installCmd) > 2):
             print(" ".join(installCmd))
-            subprocess.run(installCmd)
+            subprocess.run(installCmd, stdout=subprocess.PIPE)
     except Exception as e:
         print(e)
         print("Error with installing Pip dependencies.")
