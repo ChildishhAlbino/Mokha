@@ -65,13 +65,13 @@ def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
+    pip = dependencyJSON["pip"]
+    checkPipDependencies(pip)
+    system('cls||clear')
     remote = dependencyJSON["remote"]
     copyRemoteDependencies(remote)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
-    pip = dependencyJSON["pip"]
-    checkPipDependencies(pip)
-    system('cls||clear')
     python = dependencyJSON["python"]
     importPythonModules(python)
 
@@ -123,7 +123,6 @@ def checkPipDependencies(pipPackages):
         print(e)
         print("Error with installing Pip dependencies.")
         exit()
-    
 
 
 def importPythonModules(pythonDependencies):
