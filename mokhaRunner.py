@@ -7,6 +7,7 @@ import sys
 from shutil import copyfile
 import subprocess
 from re import compile
+from mokhaUtils import getAllSubFolders
 
 modules = {}
 baseConfig = {}
@@ -72,6 +73,7 @@ def importDependencies():
     copyRemoteDependencies(remote)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
+    appendSysPath()
     python = dependencyJSON["python"]
     importPythonModules(python)
 
@@ -89,6 +91,11 @@ def importMokhaEngine():
     print("Importing Mokha Engine.")
     mokhaEngine = importlib.import_module("mokhaEngine")
     modules["mokhaEngine"] = mokhaEngine
+
+
+def appendSysPath():
+    allSubfolders = getAllSubFolders(baseConfig["dependencies-path"])
+    sys.path.extend(allSubfolders)
 
 
 def checkPipDependencies(pipPackages):
