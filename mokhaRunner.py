@@ -137,8 +137,7 @@ def importPythonModules(pythonDependencies):
     outputStrings = []
     for dependency in pythonDependencies:
         try:
-            moduleImport = dependency
-            module = importlib.import_module(moduleImport)
+            module = importlib.import_module(dependency)
             modules[dependency] = module
             outputStrings.append("Loaded module: %s" % (dependency))
         except ModuleNotFoundError as e:
