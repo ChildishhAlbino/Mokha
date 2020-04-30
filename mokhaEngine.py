@@ -52,9 +52,10 @@ def createKWArgs(function, schema):
 
 def main(baseConfig, accounts, methods, modules):
     try:
-        user = getSelection(accounts, key="title")
-        selectedFunction = getSelection(user["functions"], key="title")
-        method = getMethodNameFromUserFunction(methods, selectedFunction)
+        account = getSelection(accounts, key="title")
+        selectedFunction = getSelection(account["methods"], key="title")
+        method = getMethodNameFromAccountMethods(
+            methods, selectedFunction["methodID"])
         moduleName = method["dependency"]
         module = modules[moduleName]
         definition = getDefinitionFromModule(
