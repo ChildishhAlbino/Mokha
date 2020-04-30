@@ -8,6 +8,7 @@ from shutil import copyfile
 import subprocess
 from re import compile
 from mokhaUtils import getAllSubFolders
+from platform import system as operatingSystem
 
 modules = {}
 baseConfig = {}
@@ -45,6 +46,10 @@ def loadBaseConfig():
 def copyRemoteDependencies(remoteDependencies):
     for remoteDependency in remoteDependencies:
         # check if file exists in dependencies folder
+        try:
+            remoteDependency = remoteDependency[operatingSystem().lower()]
+        except Exception as e:
+            continue
         try:
             remoteFileName = path.basename(remoteDependency)
             # compare equality
