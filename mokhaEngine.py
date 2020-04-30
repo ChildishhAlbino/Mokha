@@ -12,7 +12,7 @@ from mokhaUtils import getSelection, printOptions
 def getMethodNameFromAccountMethods(methods, selectedMethodID):
     try:
         methodsFiltered = [
-            method for method in methods if method['--id'] == selectedMethodID]
+            method for method in methods if method["--id"] == selectedMethodID]
         return methodsFiltered[0]
     except Exception as e:
         raise Exception("Could not find a method with id: %s" %
