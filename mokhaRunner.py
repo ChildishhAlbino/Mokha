@@ -160,21 +160,18 @@ def setup():
 
 
 def main():
-    print("LOADING...")
     setup()
     loadBaseConfig()
+    # Ensures python can see dependencies outside of root dir.
     sys.path.append(baseConfig['dependencies-path'])
     try:
         importDependencies()
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
-    # Ensures python can see dependencies outside of root dir.
-    print("Attempting to import dependencies from:\n%s" %
-          (baseConfig['dependencies-path']))
-    print("\n---------------------")
+    print("\n---------------------\n")
     print("Welcome to Mokha V2.0! This is a tool designed to enable configuration of shortcuts to python code.")
-
+    print("\n---------------------\n")
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
     kwargs = {"baseConfig": baseConfig, "accounts": accounts,
