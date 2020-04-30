@@ -44,6 +44,39 @@ def loadBaseConfig():
         baseConfig["dependencies-path"] = configJSON["dependencies-path"]
 
 
+def cloneGitRepo(gitDependency):
+    cmd = ["git", "clone", gitDependency["url"],
+           gitDependency["directoryName"]]
+    print(" ".join(cmd))
+    subprocess.run(cmd, stdout=subprocess.PIPE)
+
+
+def checkGitRepo(gitDependency):
+    cmd = ["git", "status"]
+    chdir(gitDependency["directoryName"])
+    res = subprocess.run(
+        cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
+    secondLine = res.split("\n")[1]
+    pattern = compile("your branch is behind")
+    upToDate = pattern.match(secondLine) == None
+    if (not upToDate):
+        cmd = ["git", "pull", "-f"]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE)
+        print("Pulled latest changes for: %s" % gitDependency["url"])
+    chdir(baseConfig["dependencies-path"])
+
+
+def checkGitDependencies(gitDependencies):
+    chdir(baseConfig["dependencies-path"])
+    for gitDependency in gitDependencies:
+        gitDirname = gitDependency["directoryName"]
+        if (path.exists("%s" % (gitDirname))):
+            checkGitRepo(gitDependency)
+        else:
+            cloneGitRepo(gitDependency)
+    chdir(application_path)
+
+
 def copyExternalDependencies(externalDependencies):
     for externalDependency in externalDependencies:
         # check if file exists in dependencies folder
@@ -76,6 +109,8 @@ def importDependencies():
         dependencyJSON = json.load(file)
     pip = dependencyJSON["pip"]
     checkPipDependencies(pip)
+    gitDependencies = dependencyJSON["git"]
+    checkGitDependencies(gitDependencies)
     external = dependencyJSON["external"]
     copyExternalDependencies(external)
     fileSystem = dependencyJSON["file-system"]
