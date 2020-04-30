@@ -68,7 +68,8 @@ def importDependencies():
         dependencyJSON = json.load(file)
     pip = dependencyJSON["pip"]
     checkPipDependencies(pip)
-    system('cls||clear')
+    click = importlib.import_module("click")
+    click.clear()
     remote = dependencyJSON["remote"]
     copyRemoteDependencies(remote)
     fileSystem = dependencyJSON["file-system"]
