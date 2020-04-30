@@ -44,26 +44,28 @@ def loadBaseConfig():
         baseConfig["dependencies-path"] = configJSON["dependencies-path"]
 
 
-def copyRemoteDependencies(remoteDependencies):
-    for remoteDependency in remoteDependencies:
+def copyExternalDependencies(externalDependencies):
+    for externalDependency in externalDependencies:
         # check if file exists in dependencies folder
         try:
-            remoteDependency = remoteDependency[getOperatingSystem().lower()]
+            externalDependency = externalDependency[getOperatingSystem(
+            ).lower()]
         except Exception as e:
             continue
         try:
-            remoteFileName = path.basename(remoteDependency)
+            externalFileName = path.basename(externalDependency)
             # compare equality
             localFilePath = "%s/%s" % (
-                baseConfig["dependencies-path"], remoteFileName)
+                baseConfig["dependencies-path"], externalFileName)
             updateDependency = True
             if (path.exists(localFilePath)):
-                filesEqual = cmp(remoteDependency, localFilePath)
+                filesEqual = cmp(externalDependency, localFilePath)
                 if (filesEqual):
                     updateDependency = False
             if (updateDependency):
-                print("COPYING REMOTE DEPENDENCY:\n%s" % (remoteDependency))
-                copyfile(remoteDependency, localFilePath)
+                print("COPYING EXTERNAL DEPENDENCY:\n%s" %
+                      (externalDependency))
+                copyfile(externalDependency, localFilePath)
         except Exception as e:
             print(e)
 
@@ -74,8 +76,8 @@ def importDependencies():
         dependencyJSON = json.load(file)
     pip = dependencyJSON["pip"]
     checkPipDependencies(pip)
-    remote = dependencyJSON["remote"]
-    copyRemoteDependencies(remote)
+    external = dependencyJSON["external"]
+    copyExternalDependencies(external)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
     appendSysPath()
