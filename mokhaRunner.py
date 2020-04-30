@@ -155,6 +155,7 @@ def setup():
 
 
 def main():
+    print("LOADING...")
     setup()
     loadBaseConfig()
     sys.path.append(baseConfig['dependencies-path'])
