@@ -9,12 +9,14 @@ from pathlib import Path as FilePath
 from mokhaUtils import getSelection, printOptions
 
 
-def getMethodNameFromUserFunction(methods, function):
-    for method in methods:
-        if(method["--id"] == function["methodID"]):
-            return method
-    else:
-        return "closeSafely"
+def getMethodNameFromAccountMethods(methods, selectedMethodID):
+    try:
+        methodsFiltered = [
+            method for method in methods if method['--id'] == selectedMethodID]
+        return methodsFiltered[0]
+    except Exception as e:
+        raise Exception("Could not find a method with id: %s" %
+                        (selectedMethodID["--id"]))
 
 
 def getDefinitionFromModule(module, methodName):
