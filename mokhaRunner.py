@@ -146,13 +146,13 @@ def importPythonModules(pythonDependencies):
         try:
             module = importlib.import_module(dependency)
             modules[dependency] = module
-            outputStrings.append("Loaded module: %s" % (dependency))
+            outputStrings.append("%s: ✅" % (dependency))
         except ModuleNotFoundError as e:
             print(e)
+            outputStrings.append("%s: ❌" % (dependency))
             print("\n".join(outputStrings))
-            print("Problematic Module == %s" % (dependency))
             raise Exception("Error importing python dependencies.")
-    print("\n".join(outputStrings))
+    print(" ".join(outputStrings))
 
 
 def setup():
