@@ -79,11 +79,12 @@ def runSteps(steps, stepContexts):
         # Check if user returned to previous step.
         if (not stepContext):
             if (i - 1 < 0):
+                print("\n---------------------\n")
                 print("You can't go any further back than this step.")
             else:
                 stepContexts.pop(i)
                 i = i - 1
-                clear()
+            print("\n---------------------\n")
             continue
         # do the logic to rerun the previous step
         i = i + 1
