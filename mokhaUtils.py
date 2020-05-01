@@ -13,6 +13,7 @@ def printOptions(options, key=None):
 
 def getSelection(options, key=None):
     printOptions(options, key)
+    print("0: Previous menu.")
     while True:
         try:
             selection = int(
@@ -24,6 +25,8 @@ def getSelection(options, key=None):
         except ValueError:
             print("Please input an integer value.")
     try:
+        if (selection == 0):
+            return None
         return options[selection - 1]
     except:
         print("I got an error... I sense a disturbance in the force.")

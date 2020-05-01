@@ -52,17 +52,59 @@ def createKWArgs(function, schema):
     return KWArgs
 
 
+def getAccountSelection(accounts):
+    selection = getSelection(accounts, key="title")
+    if (not selection):
+        return None
+    return {"account": selection}
+
+
+def getMethodSelection(account):
+    selection = getSelection(account["methods"], key="title")
+    if (not selection):
+        return None
+    return {"selectedMethod": selection}
+
+
+def runSteps(steps, stepContexts):
+    stepContext = None
+    i = 0
+    while True:
+        step = steps[i]
+        if (i in stepContexts.keys()):
+            stepContext = stepContexts[i]
+        else:
+            stepContexts[i] = stepContext
+        stepContext = step(**stepContext)
+        # Check if user returned to previous step.
+        if (not stepContext):
+            if (i - 1 < 0):
+                print("You can't go any further back than this step.")
+            else:
+                stepContexts.pop(i)
+                i = i - 1
+                clear()
+            continue
+        # do the logic to rerun the previous step
+        i = i + 1
+        if (i == len(steps)):
+            break
+    return stepContext
+
+
 def main(baseConfig, accounts, methods, modules):
+    stepContexts = {0: {"accounts": accounts}}
     try:
-        account = getSelection(accounts, key="title")
-        selectedFunction = getSelection(account["methods"], key="title")
+        steps = [getAccountSelection, getMethodSelection]
+        finalStepContext = runSteps(steps, stepContexts)
+        selectedMethod = finalStepContext["selectedMethod"]
         method = getMethodNameFromAccountMethods(
-            methods, selectedFunction["methodID"])
+            methods, selectedMethod["methodID"])
         moduleName = method["dependency"]
         module = modules[moduleName]
         definition = getDefinitionFromModule(
             module, method["name"])
-        arguments = createKWArgs(selectedFunction, method["schema"])
+        arguments = createKWArgs(selectedMethod, method["schema"])
         # Changes the cwd to the dependencies path so module is run as if it were run in isolation.
         chdir(baseConfig["dependencies-path"])
         definition(**arguments)
