@@ -52,15 +52,21 @@ def createKWArgs(function, schema):
     return KWArgs
 
 
-def getAccountSelection(accounts):
-    selection = getSelection(accounts, key="title")
+def getAccountSelection(context):
+    accounts = context["accounts"]
+    previousOption = context["previousOption"]
+    selection = getSelection(accounts, key="title",
+                             previousOption=previousOption)
     if (not selection):
         return None
     return {"account": selection}
 
 
-def getMethodSelection(account):
-    selection = getSelection(account["methods"], key="title")
+def getMethodSelection(context):
+    account = context["account"]
+    previousOption = context["previousOption"]
+    selection = getSelection(account["methods"], key="title",
+                             previousOption=previousOption)
     if (not selection):
         return None
     return {"selectedMethod": selection}
@@ -70,12 +76,14 @@ def runSteps(steps, stepContexts):
     stepContext = None
     i = 0
     while True:
+        previousOption = i > 0
         step = steps[i]
         if (i in stepContexts.keys()):
             stepContext = stepContexts[i]
         else:
             stepContexts[i] = stepContext
-        stepContext = step(**stepContext)
+        stepContext["previousOption"] = previousOption
+        stepContext = step(stepContext)
         # Check if user returned to previous step.
         if (not stepContext):
             if (i - 1 < 0):

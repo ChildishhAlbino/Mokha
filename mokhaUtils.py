@@ -15,20 +15,25 @@ def printDivider():
     print("\n---------------------\n")
 
 
+def getSelection(options, key=None, previousOption=False):
     printOptions(options, key)
-    print("0: Previous menu.")
+    if(previousOption):
+        print("\n0: Previous menu.")
     while True:
         try:
             selection = int(
-                input("Select an option: "))
-            if(selection <= len(options)):
+                input("\nSelect an option: "))
+            if (previousOption == True):
+                if (selection == 0):
+                    break
+            if(selection <= len(options)) and (selection > 0):
                 break
             else:
                 print("ERROR: Please enter a value inside the array.")
         except ValueError:
             print("Please input an integer value.")
     try:
-        if (selection == 0):
+        if (previousOption) and (selection == 0):
             return None
         return options[selection - 1]
     except:
