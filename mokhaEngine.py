@@ -98,6 +98,7 @@ def runSteps(steps, stepContexts):
         # do the logic to rerun the previous step
         i = i + 1
         if (i == len(steps)):
+            clear()
             break
     return stepContext
 
