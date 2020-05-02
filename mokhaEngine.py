@@ -6,7 +6,7 @@ import sys
 from click import clear
 from os import path, chdir, getcwd, system
 from pathlib import Path as FilePath
-from mokhaUtils import getSelection, printOptions
+from mokhaUtils import getSelection, printOptions, printDivider
 
 
 def getMethodNameFromAccountMethods(methods, selectedMethodID):
@@ -79,13 +79,14 @@ def runSteps(steps, stepContexts):
         # Check if user returned to previous step.
         if (not stepContext):
             if (i - 1 < 0):
-                print("\n---------------------\n")
+                printDivider()
                 print("You can't go any further back than this step.")
             else:
+                printDivider()
                 stepContexts.pop(i)
                 i = i - 1
-            print("\n---------------------\n")
             continue
+        printDivider()
         # do the logic to rerun the previous step
         i = i + 1
         if (i == len(steps)):

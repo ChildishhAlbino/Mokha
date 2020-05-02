@@ -11,7 +11,10 @@ def printOptions(options, key=None):
             print("Invalid Key")
 
 
-def getSelection(options, key=None):
+def printDivider():
+    print("\n---------------------\n")
+
+
     printOptions(options, key)
     print("0: Previous menu.")
     while True:

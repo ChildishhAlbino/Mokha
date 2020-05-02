@@ -7,7 +7,7 @@ import sys
 from shutil import copyfile
 import subprocess
 from re import compile
-from mokhaUtils import getAllSubFolders
+from mokhaUtils import getAllSubFolders, printDivider
 from platform import system as getOperatingSystem
 
 
@@ -206,9 +206,9 @@ def main():
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
-    print("\n---------------------\n")
+    printDivider()
     print("Welcome to Mokha V2.0! This is a tool designed to enable configuration of shortcuts to python code.")
-    print("\n---------------------\n")
+    printDivider()
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
     kwargs = {"baseConfig": baseConfig, "accounts": accounts,
