@@ -29,7 +29,8 @@ def getSelection(options, key=None, previousOption=False):
             if(selection <= len(options)) and (selection > 0):
                 break
             else:
-                raise("ERROR: Please enter a value inside the array.")
+                print(
+                    "ERROR: Please enter a value inside the array.")
         except ValueError:
             print("ERROR: Please input an integer value.")
     try:
