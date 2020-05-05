@@ -1,4 +1,4 @@
-from os import path, chdir, getcwd, system
+from os import path, chdir, getcwd, system, environ
 from pathlib import Path as FilePath
 import json
 from filecmp import cmp
@@ -116,8 +116,18 @@ def importDependencies():
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
     appendSysPath()
+    environmentVars = dependencyJSON["environment-vars"]
+    addEnvironmentVariables(environmentVars)
     python = dependencyJSON["python"]
     importPythonModules(python)
+
+
+def addEnvironmentVariables(environmentVars={}):
+    try:
+        environ.update(environmentVars)
+    except:
+        raise Exception("Error setting environment variables.")
+    print("Environment Variables set correctly.")
 
 
 def checkFileSystemDependencies(fileSystemDependencies):
