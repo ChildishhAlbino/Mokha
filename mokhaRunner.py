@@ -198,8 +198,6 @@ def checkPipDependency(args):
             pipPackage)
         regex = compile(regexPattern)
         installed = regex.search(pipList) != None
-        # spec = importlib.util.find_spec(pipPackage)
-        # print(spec)
         if(not installed):
             installCmd.append(pipPackage)
     try:
