@@ -92,7 +92,7 @@ def checkGitDependencies(gitDependencies):
 def copyExternalDependencies(externalDependencies):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(copyExternalDependency, externalDependencies)
-        print("External Dependencies valid!")
+    print("External Dependencies valid!")
 
 
 def copyExternalDependency(externalDependency):
@@ -111,7 +111,7 @@ def copyExternalDependency(externalDependency):
             filesEqual = cmp(externalDependency, localFilePath)
             updateDependency = not filesEqual
         if (updateDependency):
-            print("COPYING EXTERNAL DEPENDENCY:\n%s" %
+            print("COPYING EXTERNAL DEPENDENCY: %s" %
                   (externalDependency))
             copyfile(externalDependency, localFilePath)
     except Exception as e:
