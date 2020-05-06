@@ -48,7 +48,6 @@ def loadBaseConfig():
 
 def cloneGitRepo(gitDependency):
     cmd = ["git", "-C", baseConfig["dependencies-path"], "clone", "--single-branch",
-           "--branch", gitDependency["branch"], gitDependency["url"], gitDependency["directoryName"]]
     print("Git Clone on %s" % (gitDependency["url"]))
     subprocess.run(cmd, stdout=subprocess.PIPE)
 
@@ -124,13 +123,12 @@ def importDependencies():
         dependencyJSON = json.load(file)
     print("Loading all dependencies now!")
     pip = dependencyJSON["pip"]
-    checkPipDependencies(pip)
-    gitDependencies = dependencyJSON["git"]
-    checkGitDependencies(gitDependencies)
-    external = dependencyJSON["external"]
     copyExternalDependencies(external)
     fileSystem = dependencyJSON["file-system"]
     checkFileSystemDependencies(fileSystem)
+                              "dependencies": dependencyJSON["git"]},
+                             {"method": copyExternalDependencies,
+                              "dependencies": dependencyJSON["external"]},
     appendSysPath()
     environmentVars = dependencyJSON["environment-vars"]
     addEnvironmentVariables(environmentVars)
@@ -197,6 +195,10 @@ def checkPipDependency(args):
         installed = regex.search(pipList) != None
         if(not installed):
             installCmd.append(pipPackage)
+    else:
+        raise Exception(
+            "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
+
     try:
         if (len(installCmd) > 2):
             print(" ".join(installCmd))
@@ -205,9 +207,6 @@ def checkPipDependency(args):
         print(e)
         print("Error with installing Pip dependencies.")
         exit()
-    else:
-        raise Exception(
-            "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
 
 
 def importPythonModules(pythonDependencies):
