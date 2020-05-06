@@ -58,14 +58,14 @@ def pullGitRepo(gitDependency):
            path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "status"]
     print("Git Fetch on %s" % (gitDependency["url"]))
     subprocess.run(
-        ["git", "-c", path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])], "fetch", )
+        ["git", "-C", path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "fetch"])
     res = subprocess.run(
         cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
     secondLine = res.split("\n")[1]
     pattern = compile("your branch is behind")
     upToDate = pattern.match(secondLine) == None
     if (not upToDate):
-        cmd = ["git", path.join(
+        cmd = ["git", "-C", path.join(
             gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "pull", "-f"]
         res = subprocess.run(cmd, stdout=subprocess.PIPE)
         print("Pulled latest changes for: %s" % gitDependency["url"])
