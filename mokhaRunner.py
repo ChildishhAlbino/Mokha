@@ -241,8 +241,6 @@ def main():
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
-    print("Finished loading dependencies in %s seconds(s)." %
-          (round(time.perf_counter() - startingTime, 2)))
     printDivider()
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
