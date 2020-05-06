@@ -111,8 +111,7 @@ def copyExternalDependency(externalDependency):
         updateDependency = True
         if (path.exists(localFilePath)):
             filesEqual = cmp(externalDependency, localFilePath)
-            if (filesEqual):
-                updateDependency = False
+            updateDependency = not filesEqual
         if (updateDependency):
             print("COPYING EXTERNAL DEPENDENCY:\n%s" %
                   (externalDependency))
