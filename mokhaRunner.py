@@ -47,39 +47,50 @@ def loadBaseConfig():
 
 
 def cloneGitRepo(gitDependency):
-    cmd = ["git", "clone", gitDependency["url"],
+    cmd = ["git", "-C", gitDependency["gitWorkingDirectory"], "clone", gitDependency["url"],
            gitDependency["directoryName"]]
     print(" ".join(cmd))
     subprocess.run(cmd, stdout=subprocess.PIPE)
 
 
-def checkGitRepo(gitDependency):
-    cmd = ["git", "status"]
-    chdir(gitDependency["directoryName"])
+def pullGitRepo(gitDependency):
+    cmd = ["git", "-C",
+           path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "status"]
+    # chdir(gitDependency["directoryName"])
+    print("Git Fetch on %s" % (gitDependency["url"]))
+    subprocess.run(
+        ["git", "-c", path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])], "fetch", )
     res = subprocess.run(
         cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
     secondLine = res.split("\n")[1]
     pattern = compile("your branch is behind")
     upToDate = pattern.match(secondLine) == None
     if (not upToDate):
-        cmd = ["git", "pull", "-f"]
+        cmd = ["git", path.join(
+            gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "pull", "-f"]
         res = subprocess.run(cmd, stdout=subprocess.PIPE)
         print("Pulled latest changes for: %s" % gitDependency["url"])
-    chdir(baseConfig["dependencies-path"])
+
+
+def checkGitRepo(gitDependency):
+    # chdir(baseConfig["dependencies-path"])
+    gitDirname = path.join(
+        gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])
+    if (path.exists("%s" % (gitDirname))):
+        pullGitRepo(gitDependency)
+    else:
+        cloneGitRepo(gitDependency)
 
 
 def checkGitDependencies(gitDependencies):
-    chdir(baseConfig["dependencies-path"])
+
     for gitDependency in gitDependencies:
-        gitDirname = gitDependency["directoryName"]
-        if (path.exists("%s" % (gitDirname))):
-            checkGitRepo(gitDependency)
-        else:
-            cloneGitRepo(gitDependency)
-    chdir(application_path)
+        gitDependency.update(
+            {"gitWorkingDirectory": baseConfig["dependencies-path"]})
 
-
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         try:
+            executor.map(checkGitRepo, gitDependencies)
         except Exception as e:
             print(e)
 
