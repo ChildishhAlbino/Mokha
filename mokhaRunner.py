@@ -47,18 +47,19 @@ def loadBaseConfig():
 
 
 def cloneGitRepo(gitDependency):
-    cmd = ["git", "-C", gitDependency["gitWorkingDirectory"], "clone", gitDependency["url"],
-           gitDependency["directoryName"]]
-    print(" ".join(cmd))
+    cmd = ["git", "-C", baseConfig["dependencies-path"], "clone", "--single-branch",
+           "--branch", gitDependency["branch"], gitDependency["url"], gitDependency["directoryName"]]
+    print("Git Clone on %s" % (gitDependency["url"]))
     subprocess.run(cmd, stdout=subprocess.PIPE)
 
 
 def pullGitRepo(gitDependency):
     cmd = ["git", "-C",
-           path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "status"]
+           path.join(baseConfig["dependencies-path"], gitDependency["directoryName"]), "status"]
     print("Git Fetch on %s" % (gitDependency["url"]))
     subprocess.run(
-        ["git", "-C", path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "fetch"])
+        ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directoryName"]),
+         "fetch", "origin", gitDependency["branch"], "-q"])
     res = subprocess.run(
         cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
     secondLine = res.split("\n")[1]
@@ -66,14 +67,14 @@ def pullGitRepo(gitDependency):
     upToDate = pattern.match(secondLine) == None
     if (not upToDate):
         cmd = ["git", "-C", path.join(
-            gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "pull", "-f"]
+            baseConfig["dependencies-path"], gitDependency["directoryName"]), "pull", "-f"]
         res = subprocess.run(cmd, stdout=subprocess.PIPE)
         print("Pulled latest changes for: %s" % gitDependency["url"])
 
 
 def checkGitRepo(gitDependency):
     gitDirname = path.join(
-        gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])
+        baseConfig["dependencies-path"], gitDependency["directoryName"])
     if (path.exists("%s" % (gitDirname))):
         pullGitRepo(gitDependency)
     else:
@@ -81,9 +82,6 @@ def checkGitRepo(gitDependency):
 
 
 def checkGitDependencies(gitDependencies):
-    for gitDependency in gitDependencies:
-        gitDependency.update(
-            {"gitWorkingDirectory": baseConfig["dependencies-path"]})
     with concurrent.futures.ThreadPoolExecutor() as executor:
         try:
             executor.map(checkGitRepo, gitDependencies)
