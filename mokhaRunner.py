@@ -44,6 +44,7 @@ def loadBaseConfig():
         for configType in configTypes.keys():
             baseConfig[configType] = configTypes[configType]
         baseConfig["dependencies-path"] = configJSON["dependencies-path"]
+    print("Base Config: ✅")
 
 
 def cloneGitRepo(gitDependency):
@@ -87,12 +88,13 @@ def checkGitDependencies(gitDependencies):
             executor.map(checkGitRepo, gitDependencies)
         except Exception as e:
             print(e)
+    print("Git Dependencies: ✅")
 
 
 def copyExternalDependencies(externalDependencies):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(copyExternalDependency, externalDependencies)
-    print("External Dependencies valid!")
+    print("External Dependencies: ✅")
 
 
 def copyExternalDependency(externalDependency):
@@ -111,8 +113,6 @@ def copyExternalDependency(externalDependency):
             filesEqual = cmp(externalDependency, localFilePath)
             updateDependency = not filesEqual
         if (updateDependency):
-            print("COPYING EXTERNAL DEPENDENCY: %s" %
-                  (externalDependency))
             copyfile(externalDependency, localFilePath)
     except Exception as e:
         print(e)
@@ -128,7 +128,7 @@ def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
-    print("Loading all dependencies now!")
+    print("Loading user dependencies now!")
 
     firstWaveDependencies = [{"method": checkPipDependencies,
                               "dependencies": dependencyJSON["pip"]},
@@ -156,7 +156,7 @@ def addEnvironmentVariables(environmentVars={}):
         environ.update(environmentVars)
     except:
         raise Exception("Error setting environment variables.")
-    print("Environment Variables set correctly.")
+    print("Environment Variables: ✅")
 
 
 def checkFileSystemDependencies(fileSystemDependencies):
@@ -164,7 +164,7 @@ def checkFileSystemDependencies(fileSystemDependencies):
     for fileSystemDependency in fileSystemDependencies:
         if(path.exists(fileSystemDependency) == False):
             raise Exception("Error checking file system dependencies.")
-    print("Filesystem dependencies loaded successfully.")
+    print("Filesystem dependencies: ✅")
     chdir(application_path)
 
 
@@ -186,7 +186,7 @@ def checkPipDependencies(pipPackages):
             for pipPackage in pipPackages]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(checkPipDependency, args)
-    print("Pip Dependencies Installed")
+    print("Pip Dependencies: ✅")
 
 
 def checkPipDependency(args):
