@@ -56,7 +56,6 @@ def cloneGitRepo(gitDependency):
 def pullGitRepo(gitDependency):
     cmd = ["git", "-C",
            path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"]), "status"]
-    # chdir(gitDependency["directoryName"])
     print("Git Fetch on %s" % (gitDependency["url"]))
     subprocess.run(
         ["git", "-c", path.join(gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])], "fetch", )
@@ -73,7 +72,6 @@ def pullGitRepo(gitDependency):
 
 
 def checkGitRepo(gitDependency):
-    # chdir(baseConfig["dependencies-path"])
     gitDirname = path.join(
         gitDependency["gitWorkingDirectory"], gitDependency["directoryName"])
     if (path.exists("%s" % (gitDirname))):
@@ -83,11 +81,9 @@ def checkGitRepo(gitDependency):
 
 
 def checkGitDependencies(gitDependencies):
-
     for gitDependency in gitDependencies:
         gitDependency.update(
             {"gitWorkingDirectory": baseConfig["dependencies-path"]})
-
     with concurrent.futures.ThreadPoolExecutor() as executor:
         try:
             executor.map(checkGitRepo, gitDependencies)
