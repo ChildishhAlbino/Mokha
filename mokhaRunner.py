@@ -10,6 +10,7 @@ from re import compile
 from mokhaUtils import getAllSubFolders, printDivider
 from platform import system as getOperatingSystem
 import time
+import concurrent.futures
 
 
 modules = {}
@@ -78,30 +79,39 @@ def checkGitDependencies(gitDependencies):
     chdir(application_path)
 
 
-def copyExternalDependencies(externalDependencies):
-    for externalDependency in externalDependencies:
-        # check if file exists in dependencies folder
         try:
-            externalDependency = externalDependency[getOperatingSystem(
-            ).lower()]
-        except Exception as e:
-            continue
-        try:
-            externalFileName = path.basename(externalDependency)
-            # compare equality
-            localFilePath = "%s/%s" % (
-                baseConfig["dependencies-path"], externalFileName)
-            updateDependency = True
-            if (path.exists(localFilePath)):
-                filesEqual = cmp(externalDependency, localFilePath)
-                if (filesEqual):
-                    updateDependency = False
-            if (updateDependency):
-                print("COPYING EXTERNAL DEPENDENCY:\n%s" %
-                      (externalDependency))
-                copyfile(externalDependency, localFilePath)
         except Exception as e:
             print(e)
+
+
+def copyExternalDependencies(externalDependencies):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(copyExternalDependency, externalDependencies)
+        print("External Dependencies valid!")
+
+
+def copyExternalDependency(externalDependency):
+    try:
+        externalDependency = externalDependency[getOperatingSystem(
+        ).lower()]
+    except Exception as e:
+        return
+    try:
+        externalFileName = path.basename(externalDependency)
+        # compare equality
+        localFilePath = "%s/%s" % (
+            baseConfig["dependencies-path"], externalFileName)
+        updateDependency = True
+        if (path.exists(localFilePath)):
+            filesEqual = cmp(externalDependency, localFilePath)
+            if (filesEqual):
+                updateDependency = False
+        if (updateDependency):
+            print("COPYING EXTERNAL DEPENDENCY:\n%s" %
+                  (externalDependency))
+            copyfile(externalDependency, localFilePath)
+    except Exception as e:
+        print(e)
 
 
 def importDependencies():
