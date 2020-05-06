@@ -220,8 +220,6 @@ def main():
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
-    printDivider()
-    print("Welcome to Mokha V2.0! This is a tool designed to enable configuration of shortcuts to python code.")
     print("Finished loading dependencies in %s seconds(s)." %
           (round(time.perf_counter() - startingTime, 2)))
     printDivider()
