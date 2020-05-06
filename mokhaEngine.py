@@ -115,9 +115,11 @@ def main(baseConfig, accounts, methods, modules):
         module = modules[moduleName]
         definition = getDefinitionFromModule(
             module, method["name"])
+        (parentDir, fileName) = path.split(module.__file__)
         arguments = createKWArgs(selectedMethod, method["schema"])
-        # Changes the cwd to the dependencies path so module is run as if it were run in isolation.
-        chdir(baseConfig["dependencies-path"])
+        # Changes the cwd to the module's parent directory
+        # so the module is run as if it were run in isolation.
+        chdir(parentDir)
         definition(**arguments)
     except KeyboardInterrupt:
         print("You pressed Ctrl + C!")
