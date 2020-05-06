@@ -172,27 +172,36 @@ def appendSysPath():
 def checkPipDependencies(pipPackages):
     pipList = subprocess.run(
         "pip list".split(), stdout=subprocess.PIPE).stdout.decode('utf-8').lower()
+    args = [{"pipPackage": pipPackage, "list": pipList}
+            for pipPackage in pipPackages]
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(checkPipDependency, args)
+    print("Pip Dependencies Installed")
+
+
+def checkPipDependency(args):
+    pipPackage = args["pipPackage"]
+    pipList = args["list"]
+    pipType = type(pipPackage)
     installCmd = ["pip", "install"]
-    for pipPackage in pipPackages:
-        pipType = type(pipPackage)
-        if (pipType == dict):
-            regexPattern = "%s\\s+%s" % (
-                pipPackage["package-name"], pipPackage["version"])
-            regex = compile(regexPattern)
-            installed = regex.search(pipList) != None
-            if(not installed):
-                installCmd.append("%s==%s" % (
-                    pipPackage["package-name"], pipPackage["version"]))
-        elif (pipType == str):
-            regexPattern = "%s\\s+" % (
-                pipPackage)
-            regex = compile(regexPattern)
-            installed = regex.search(pipList) != None
-            if(not installed):
-                installCmd.append(pipPackage)
-        else:
-            raise Exception(
-                "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
+    if (pipType == dict):
+        regexPattern = "%s\\s+%s" % (
+            pipPackage["package-name"], pipPackage["version"])
+        regex = compile(regexPattern)
+        installed = regex.search(pipList) != None
+        if(not installed):
+            installCmd.append("%s==%s" % (
+                pipPackage["package-name"], pipPackage["version"]))
+    elif (pipType == str):
+
+        regexPattern = "%s\\s+" % (
+            pipPackage)
+        regex = compile(regexPattern)
+        installed = regex.search(pipList) != None
+        # spec = importlib.util.find_spec(pipPackage)
+        # print(spec)
+        if(not installed):
+            installCmd.append(pipPackage)
     try:
         if (len(installCmd) > 2):
             print(" ".join(installCmd))
@@ -201,7 +210,9 @@ def checkPipDependencies(pipPackages):
         print(e)
         print("Error with installing Pip dependencies.")
         exit()
-    print("Pip Dependencies Installed")
+    else:
+        raise Exception(
+            "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
 
 
 def importPythonModules(pythonDependencies):
