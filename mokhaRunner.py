@@ -9,6 +9,7 @@ import subprocess
 from re import compile
 from mokhaUtils import getAllSubFolders, printDivider
 from platform import system as getOperatingSystem
+import time
 
 
 modules = {}
@@ -107,6 +108,7 @@ def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
+    print("Loading all dependencies now!")
     pip = dependencyJSON["pip"]
     checkPipDependencies(pip)
     gitDependencies = dependencyJSON["git"]
@@ -182,6 +184,7 @@ def checkPipDependencies(pipPackages):
         print(e)
         print("Error with installing Pip dependencies.")
         exit()
+    print("Pip Dependencies Installed")
 
 
 def importPythonModules(pythonDependencies):
@@ -207,6 +210,7 @@ def setup():
 
 
 def main():
+    startingTime = time.perf_counter()
     setup()
     loadBaseConfig()
     # Ensures python can see dependencies outside of root dir.
@@ -218,13 +222,19 @@ def main():
         exit("Could not import dependencies correctly. Please check your config.")
     printDivider()
     print("Welcome to Mokha V2.0! This is a tool designed to enable configuration of shortcuts to python code.")
+    print("Finished loading dependencies in %s seconds(s)." %
+          (round(time.perf_counter() - startingTime, 2)))
     printDivider()
     accounts = loadJSON(baseConfig["accounts"])
     methods = loadJSON(baseConfig["methods"])
     kwargs = {"baseConfig": baseConfig, "accounts": accounts,
               "methods": methods, "modules": modules}
     mokhaEngine = modules["mokhaEngine"]
+    print("Welcome to Mokha V2.0! {Booted in %s seconds(s)} This is a tool designed to enable configuration of shortcuts to python code." % (
+        round(time.perf_counter() - startingTime, 2)))
+    printDivider()
     mokhaEngine.main(**kwargs)
+    time.sleep(1)
 
 
 if (__name__ == "__main__"):
