@@ -48,16 +48,17 @@ def loadBaseConfig():
 
 def cloneGitRepo(gitDependency):
     cmd = ["git", "-C", baseConfig["dependencies-path"], "clone", "--single-branch",
+           "--branch", gitDependency["branch"], gitDependency["url"], gitDependency["directory-name"]]
     print("Git Clone on %s" % (gitDependency["url"]))
     subprocess.run(cmd, stdout=subprocess.PIPE)
 
 
 def pullGitRepo(gitDependency):
     cmd = ["git", "-C",
-           path.join(baseConfig["dependencies-path"], gitDependency["directoryName"]), "status"]
+           path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
     print("Git Fetch on %s" % (gitDependency["url"]))
     subprocess.run(
-        ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directoryName"]),
+        ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]),
          "fetch", "origin", gitDependency["branch"], "-q"])
     res = subprocess.run(
         cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
@@ -66,14 +67,14 @@ def pullGitRepo(gitDependency):
     upToDate = pattern.match(secondLine) == None
     if (not upToDate):
         cmd = ["git", "-C", path.join(
-            baseConfig["dependencies-path"], gitDependency["directoryName"]), "pull", "-f"]
+            baseConfig["dependencies-path"], gitDependency["directory-name"]), "pull", "-f"]
         res = subprocess.run(cmd, stdout=subprocess.PIPE)
         print("Pulled latest changes for: %s" % gitDependency["url"])
 
 
 def checkGitRepo(gitDependency):
     gitDirname = path.join(
-        baseConfig["dependencies-path"], gitDependency["directoryName"])
+        baseConfig["dependencies-path"], gitDependency["directory-name"])
     if (path.exists("%s" % (gitDirname))):
         pullGitRepo(gitDependency)
     else:
