@@ -118,23 +118,37 @@ def copyExternalDependency(externalDependency):
         print(e)
 
 
+def handleDependencies(args):
+    method = args["method"]
+    dependencies = args["dependencies"]
+    method(dependencies)
+
+
 def importDependencies():
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
     print("Loading all dependencies now!")
-    pip = dependencyJSON["pip"]
-    copyExternalDependencies(external)
-    fileSystem = dependencyJSON["file-system"]
-    checkFileSystemDependencies(fileSystem)
+
+    firstWaveDependencies = [{"method": checkPipDependencies,
+                              "dependencies": dependencyJSON["pip"]},
+                             {"method": checkGitDependencies,
                               "dependencies": dependencyJSON["git"]},
                              {"method": copyExternalDependencies,
                               "dependencies": dependencyJSON["external"]},
+                             {"method": addEnvironmentVariables,
+                              "dependencies": dependencyJSON["environment-vars"]},
+                             ]
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(handleDependencies, firstWaveDependencies)
+
+    secondWaveDependencies = [{"method": checkFileSystemDependencies,
+                               "dependencies": dependencyJSON["file-system"]},
+                              {"method": importPythonModules,
+                               "dependencies": dependencyJSON["python"]}]
     appendSysPath()
-    environmentVars = dependencyJSON["environment-vars"]
-    addEnvironmentVariables(environmentVars)
-    python = dependencyJSON["python"]
-    importPythonModules(python)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(handleDependencies, secondWaveDependencies)
 
 
 def addEnvironmentVariables(environmentVars={}):
