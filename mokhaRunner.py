@@ -130,15 +130,16 @@ def importDependencies():
         dependencyJSON = json.load(file)
     print("Loading user dependencies now!")
 
-    firstWaveDependencies = [{"method": checkPipDependencies,
-                              "dependencies": dependencyJSON["pip"]},
-                             {"method": checkGitDependencies,
-                              "dependencies": dependencyJSON["git"]},
-                             {"method": copyExternalDependencies,
-                              "dependencies": dependencyJSON["external"]},
-                             {"method": addEnvironmentVariables,
-                              "dependencies": dependencyJSON["environment-vars"]},
-                             ]
+    firstWaveDependencies = [
+        {"method": checkGitDependencies,
+         "dependencies": dependencyJSON["git"]},
+        {"method": checkPipDependencies,
+         "dependencies": dependencyJSON["pip"]},
+        {"method": copyExternalDependencies,
+         "dependencies": dependencyJSON["external"]},
+        {"method": addEnvironmentVariables,
+         "dependencies": dependencyJSON["environment-vars"]},
+    ]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(handleDependencies, firstWaveDependencies)
 
