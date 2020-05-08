@@ -1,4 +1,5 @@
-from os import path, chdir, getcwd, system, listdir, scandir
+from os import path, chdir, getcwd, system, listdir, scandir, walk
+import concurrent.futures
 
 
 def printOptions(options, key=None):
@@ -42,10 +43,13 @@ def getSelection(options, key=None, previousOption=False):
 
 
 def getAllSubFolders(startingPath):
-    # get subfolders for starting path
-    subfolders = [f.path for f in scandir(startingPath) if f.is_dir()]
-    # check if subfolders contain any subfolders,
-    for subfolder in subfolders:
-        moreSubfolders = getAllSubFolders(subfolder)
-        subfolders.extend(moreSubfolders)
-    return subfolders
+
+    # dirs = [x[0] for x in walk(startingPath)]
+    # return dirs
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        subfolders = [f.path for f in scandir(startingPath) if f.is_dir()]
+        if(len(subfolders) > 0):
+            res = list(executor.map(getAllSubFolders, subfolders))
+            if(len(res) > 0):
+                subfolders.extend([r for r in res if r])
+            return subfolders
