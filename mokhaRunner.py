@@ -194,7 +194,7 @@ def checkPipDependency(args):
     pipPackage = args["pipPackage"]
     pipList = args["list"]
     pipType = type(pipPackage)
-    installCmd = ["pip", "install"]
+    installCmd = ["pip", "install", "--quiet"]
     if (pipType == dict):
         regexPattern = "%s\\s+%s" % (
             pipPackage["package-name"], pipPackage["version"])
@@ -216,7 +216,7 @@ def checkPipDependency(args):
             "Don't know how to handle this type of object as Pip dependency mate. Fix ya config!")
 
     try:
-        if (len(installCmd) > 2):
+        if (len(installCmd) > 3):
             print(" ".join(installCmd))
             subprocess.run(installCmd, stdout=subprocess.PIPE)
     except Exception as e:
