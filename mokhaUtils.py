@@ -44,8 +44,9 @@ def getSelection(options, key=None, previousOption=False):
 
 def getAllSubFolders(startingPath):
 
-    # dirs = [x[0] for x in walk(startingPath)]
-    # return dirs
+    dirs = [x[0] for x in walk(startingPath)]
+    return dirs
+    subfolders = [startingPath]
     with concurrent.futures.ThreadPoolExecutor() as executor:
         subfolders = [f.path for f in scandir(startingPath) if f.is_dir()]
         if(len(subfolders) > 0):

@@ -12,11 +12,11 @@ from platform import system as getOperatingSystem
 import time
 import concurrent.futures
 
-
 modules = {}
 baseConfig = {}
 application_path = ""
 data = None
+gitUpdate = False
 
 
 def loadJSON(filePath):
@@ -55,31 +55,43 @@ def cloneGitRepo(gitDependency):
 
 
 def pullGitRepo(gitDependency):
-    cmd = ["git", "-C",
-           path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
-    print("Git Fetch on %s" % (gitDependency["url"]))
-    subprocess.run(
-        ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]),
-         "fetch", "origin", gitDependency["branch"], "-q"])
+    global gitUpdate
+    t1 = time.perf_counter()
+    statusCMD = ["git", "-C",
+                 path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
+
+    fetchCMD = ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]),
+                "fetch", "origin", gitDependency["branch"], "-q"]
+
+    cmd = []
+    cmd.extend(fetchCMD)
+    cmd.append("&&")
+    cmd.extend(statusCMD)
     res = subprocess.run(
-        cmd, stdout=subprocess.PIPE).stdout.decode('utf-8').lower().strip()
+        cmd, stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8').lower().strip()
+    t2 = time.perf_counter()
+    print("%s took %s seconds" % (gitDependency["url"], round(t2 - t1, 2)))
     secondLine = res.split("\n")[1]
     pattern = compile("your branch is behind")
     upToDate = pattern.match(secondLine) == None
     if (not upToDate):
         cmd = ["git", "-C", path.join(
             baseConfig["dependencies-path"], gitDependency["directory-name"]), "pull", "-f"]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE)
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
         print("Pulled latest changes for: %s" % gitDependency["url"])
+        gitUpdate = True
 
 
 def checkGitRepo(gitDependency):
+    t1 = time.perf_counter()
     gitDirname = path.join(
         baseConfig["dependencies-path"], gitDependency["directory-name"])
     if (path.exists("%s" % (gitDirname))):
         pullGitRepo(gitDependency)
     else:
         cloneGitRepo(gitDependency)
+    t2 = time.perf_counter()
+    # print("%s took %s seconds" % (gitDependency, round(t2 - t1, 2)))
 
 
 def checkGitDependencies(gitDependencies):
@@ -125,6 +137,8 @@ def handleDependencies(args):
 
 
 def importDependencies():
+    global gitUpdate
+
     dependencyJSON = None
     with open(baseConfig["dependencies"]) as file:
         dependencyJSON = json.load(file)
@@ -140,16 +154,25 @@ def importDependencies():
         {"method": addEnvironmentVariables,
          "dependencies": dependencyJSON["environment-vars"]},
     ]
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(handleDependencies, firstWaveDependencies)
 
     secondWaveDependencies = [{"method": checkFileSystemDependencies,
                                "dependencies": dependencyJSON["file-system"]},
                               {"method": importPythonModules,
                                "dependencies": dependencyJSON["python"]}]
-    appendSysPath()
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(handleDependencies, secondWaveDependencies)
+
+        executor.map(handleDependencies, firstWaveDependencies)
+
+        appendSysPath()
+
+        p = executor.map(handleDependencies, secondWaveDependencies)
+        l = list(p)
+    if(gitUpdate):
+        print("There was a git update detected.")
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            appendSysPath()
+            executor.map(handleDependencies, secondWaveDependencies)
 
 
 def addEnvironmentVariables(environmentVars={}):
@@ -251,10 +274,12 @@ def main():
     startingTime = time.perf_counter()
     setup()
     loadBaseConfig()
-    # Ensures python can see dependencies outside of root dir.
-    sys.path.append(baseConfig['dependencies-path'])
     try:
         importDependencies()
+        if(gitUpdate):
+            print("There was a git update detected. Please rerun mokha")
+            time.sleep("2")
+            exit()
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
