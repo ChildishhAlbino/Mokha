@@ -71,9 +71,7 @@ def pullGitRepo(gitDependency):
         cmd, stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8').lower().strip()
     t2 = time.perf_counter()
     print("%s took %s seconds" % (gitDependency["url"], round(t2 - t1, 2)))
-    secondLine = res.split("\n")[1]
-    pattern = compile("your branch is behind")
-    upToDate = pattern.match(secondLine) == None
+    upToDate = "your branch is behind" not in res
     if (not upToDate):
         cmd = ["git", "-C", path.join(
             baseConfig["dependencies-path"], gitDependency["directory-name"]), "pull", "-f"]
@@ -167,12 +165,6 @@ def importDependencies():
         appendSysPath()
 
         p = executor.map(handleDependencies, secondWaveDependencies)
-        l = list(p)
-    if(gitUpdate):
-        print("There was a git update detected.")
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            appendSysPath()
-            executor.map(handleDependencies, secondWaveDependencies)
 
 
 def addEnvironmentVariables(environmentVars={}):
@@ -227,11 +219,8 @@ def checkPipDependency(args):
             installCmd.append("%s==%s" % (
                 pipPackage["package-name"], pipPackage["version"]))
     elif (pipType == str):
-
-        regexPattern = "%s\\s+" % (
-            pipPackage)
-        regex = compile(regexPattern)
-        installed = regex.search(pipList) != None
+        installed = pipPackage in pipList
+        print(pipPackage)
         if(not installed):
             installCmd.append(pipPackage)
     else:
@@ -278,8 +267,8 @@ def main():
         importDependencies()
         if(gitUpdate):
             print("There was a git update detected. Please rerun mokha")
-            time.sleep("2")
-            exit()
+            time.sleep(2)
+            exit(0)
     except Exception as e:
         print(e)
         exit("Could not import dependencies correctly. Please check your config.")
