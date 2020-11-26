@@ -220,7 +220,6 @@ def checkPipDependency(args):
                 pipPackage["package-name"], pipPackage["version"]))
     elif (pipType == str):
         installed = pipPackage in pipList
-        print(pipPackage)
         if(not installed):
             installCmd.append(pipPackage)
     else:
