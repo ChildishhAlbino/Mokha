@@ -63,12 +63,10 @@ def pullGitRepo(gitDependency):
     fetchCMD = ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]),
                 "fetch", "origin", gitDependency["branch"], "-q"]
 
-    cmd = []
-    cmd.extend(fetchCMD)
-    cmd.append("&&")
-    cmd.extend(statusCMD)
+    subprocess.run(
+        fetchCMD, stdout=subprocess.PIPE, shell=True)
     res = subprocess.run(
-        cmd, stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8').lower().strip()
+        statusCMD, stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8').lower().strip()
     t2 = time.perf_counter()
     print("%s took %s seconds" % (gitDependency["url"], round(t2 - t1, 2)))
     upToDate = "your branch is behind" not in res
