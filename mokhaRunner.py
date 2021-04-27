@@ -48,23 +48,26 @@ def loadBaseConfig():
 
 
 def cloneGitRepo(gitDependency):
+    global gitUpdate
     cmd = ["git", "-C", baseConfig["dependencies-path"], "clone", "--single-branch",
            "--branch", gitDependency["branch"], gitDependency["url"], gitDependency["directory-name"]]
     print("Git Clone on %s" % (gitDependency["url"]))
     subprocess.run(cmd, stdout=subprocess.PIPE)
+    gitUpdate = True
 
 
 def pullGitRepo(gitDependency):
     global gitUpdate
     t1 = time.perf_counter()
-    statusCMD = ["git", "-C",
-                 path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
 
     fetchCMD = ["git", "-C", path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]),
-                "fetch", "origin", gitDependency["branch"], "-q"]
+                "fetch", "origin", gitDependency["branch"], "-q", "--no-tags"]
 
     subprocess.run(
         fetchCMD, stdout=subprocess.PIPE, shell=True)
+
+    statusCMD = ["git", "-C",
+                 path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
     res = subprocess.run(
         statusCMD, stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8').lower().strip()
     t2 = time.perf_counter()
@@ -73,7 +76,7 @@ def pullGitRepo(gitDependency):
     if (not upToDate):
         cmd = ["git", "-C", path.join(
             baseConfig["dependencies-path"], gitDependency["directory-name"]), "pull", "-f"]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
+        subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
         print("Pulled latest changes for: %s" % gitDependency["url"])
         gitUpdate = True
 
@@ -82,7 +85,7 @@ def checkGitRepo(gitDependency):
     t1 = time.perf_counter()
     gitDirname = path.join(
         baseConfig["dependencies-path"], gitDependency["directory-name"])
-    if (path.exists("%s" % (gitDirname))):
+    if path.exists("%s" % (gitDirname)):
         pullGitRepo(gitDependency)
     else:
         cloneGitRepo(gitDependency)
@@ -157,7 +160,6 @@ def importDependencies():
                                "dependencies": dependencyJSON["python"]}]
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-
         executor.map(handleDependencies, firstWaveDependencies)
 
         appendSysPath()
@@ -176,7 +178,7 @@ def addEnvironmentVariables(environmentVars={}):
 def checkFileSystemDependencies(fileSystemDependencies):
     chdir(baseConfig["dependencies-path"])
     for fileSystemDependency in fileSystemDependencies:
-        if(path.exists(fileSystemDependency) == False):
+        if (path.exists(fileSystemDependency) == False):
             raise Exception("Error checking file system dependencies.")
     print("Filesystem dependencies: ✅")
     chdir(application_path)
@@ -213,12 +215,12 @@ def checkPipDependency(args):
             pipPackage["package-name"], pipPackage["version"])
         regex = compile(regexPattern)
         installed = regex.search(pipList) != None
-        if(not installed):
+        if (not installed):
             installCmd.append("%s==%s" % (
                 pipPackage["package-name"], pipPackage["version"]))
     elif (pipType == str):
         installed = pipPackage in pipList
-        if(not installed):
+        if (not installed):
             installCmd.append(pipPackage)
     else:
         raise Exception(
@@ -262,7 +264,7 @@ def main():
     loadBaseConfig()
     try:
         importDependencies()
-        if(gitUpdate):
+        if (gitUpdate):
             print("There was a git update detected. Please rerun mokha")
             time.sleep(2)
             exit(0)
@@ -275,8 +277,9 @@ def main():
     kwargs = {"baseConfig": baseConfig, "accounts": accounts,
               "methods": methods, "modules": modules}
     mokhaEngine = modules["mokhaEngine"]
-    print("Welcome to Mokha V2.0! {Booted in %s seconds(s)} This is a tool designed to enable configuration of shortcuts to python code." % (
-        round(time.perf_counter() - startingTime, 2)))
+    print(
+        "Welcome to Mokha V2.0! {Booted in %s seconds(s)} This is a tool designed to enable configuration of shortcuts to python code." % (
+            round(time.perf_counter() - startingTime, 2)))
     printDivider()
     mokhaEngine.main(**kwargs)
     time.sleep(1)
