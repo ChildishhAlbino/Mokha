@@ -65,7 +65,8 @@ def pullGitRepo(gitDependency):
 
     subprocess.run(
         fetchCMD, stdout=subprocess.PIPE, shell=True)
-
+    t2 = time.perf_counter()
+    print("%s took %s seconds" % (gitDependency["url"], round(t2 - t1, 2)))
     statusCMD = ["git", "-C",
                  path.join(baseConfig["dependencies-path"], gitDependency["directory-name"]), "status"]
     res = subprocess.run(
@@ -73,7 +74,7 @@ def pullGitRepo(gitDependency):
     t2 = time.perf_counter()
     print("%s took %s seconds" % (gitDependency["url"], round(t2 - t1, 2)))
     upToDate = "your branch is behind" not in res
-    if (not upToDate):
+    if not upToDate:
         cmd = ["git", "-C", path.join(
             baseConfig["dependencies-path"], gitDependency["directory-name"]), "pull", "-f"]
         subprocess.run(cmd, stdout=subprocess.PIPE, shell=True)
