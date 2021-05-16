@@ -4,7 +4,7 @@ import subprocess
 import platform
 import sys
 from click import clear
-from os import path, chdir, getcwd, system
+from os import path, chdir, getcwd, system, environ
 from pathlib import Path as FilePath
 from mokhaUtils import getSelection, printOptions, printDivider
 
@@ -37,16 +37,30 @@ def getDefinitionFromModule(module, methodName):
 def createKWArgs(function, schema):
     KWArgs = {}
     arguments = function["arguments"]
-    if(len(arguments.keys()) != schema["numParams"]):
+    min_params = schema.get("minParams", None)
+    max_params = schema.get("maxParams", None)
+    num_params = schema.get("numParams", None)
+    if(num_params):
+        min_params = num_params
+        max_params = num_params
+    args_length = len(arguments.keys())
+    if(args_length not in range(min_params, max_params + 1)):
         print("Invalid")
         raise Exception(
             "Please supply the same # of arguments as outlined in numParams.")
-    if(list(arguments.keys()) != schema["parameterNames"]):
+    illegal_params = [item for item in arguments.keys(
+    ) if item not in schema["parameterNames"]]
+    if len(illegal_params) > 0:
         raise Exception(
             "Please supply the same argument names as outlined in paramatersNames. Please note this is case sensitive.")
     for parameter in schema["parameterNames"]:
         if(parameter == "clipboardContext"):
             KWArgs[parameter] = pyperclip.paste()
+            continue
+        argumentValue = arguments[parameter]
+        if("$" in argumentValue and "/$" not in argumentValue):
+            environment_var_name = argumentValue.replace("$", "")
+            KWArgs[parameter] = environ.get(environment_var_name, None)
             continue
         KWArgs[parameter] = arguments[parameter]
     return KWArgs

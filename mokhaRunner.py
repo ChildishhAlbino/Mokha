@@ -170,8 +170,12 @@ def importDependencies():
 
 def addEnvironmentVariables(environmentVars={}):
     try:
-        environ.update(environmentVars)
-    except:
+        for key, value in environmentVars.items():
+            already_set = environ.get(key, None) != None
+            if not already_set:
+                environ[key] = str(value)
+    except Exception as e:
+        print(e)
         raise Exception("Error setting environment variables.")
     print("Environment Variables: ✅")
 
