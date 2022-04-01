@@ -40,7 +40,7 @@ def createKWArgs(function, schema):
     min_params = schema.get("minParams", None)
     max_params = schema.get("maxParams", None)
     num_params = schema.get("numParams", None)
-    if(num_params):
+    if(num_params != None):
         min_params = num_params
         max_params = num_params
     args_length = len(arguments.keys())
